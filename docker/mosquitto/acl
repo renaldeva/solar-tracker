@@ -1,0 +1,18 @@
+# ==============================================================================
+# Mosquitto ACL Configuration – Solar Tracker Industrial Monitoring
+# ==============================================================================
+
+# Backend User (Used by Laravel for listener & command dispatcher)
+# Full read/write access to all tracker topics and broker stats
+user solar_backend
+topic readwrite tracker/#
+topic read $SYS/#
+
+# Pre-seeded Demo Device: ST-DEMO-001
+# ESP32 can only publish telemetry, status, event, ack; and subscribe to cmd
+user device_ST-DEMO-001
+topic write tracker/ST-DEMO-001/telemetry
+topic write tracker/ST-DEMO-001/status
+topic write tracker/ST-DEMO-001/event
+topic write tracker/ST-DEMO-001/ack
+topic read tracker/ST-DEMO-001/cmd
