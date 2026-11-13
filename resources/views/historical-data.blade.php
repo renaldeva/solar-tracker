@@ -8,7 +8,7 @@
             <div class="flex items-center space-x-2">
                 <a 
                     href="{{ route('historical-data.export', request()->all()) }}" 
-                    class="inline-flex items-center h-9 px-3 rounded-md border border-line bg-panel hover:bg-line/40 text-ink text-sm font-medium transition-colors"
+                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-slate-50 text-ink text-sm font-medium transition-colors shadow-xs"
                     title="{{ __('Ekspor Kumpulan Data CSV') }}"
                 >
                     <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,47 +20,81 @@
         </x-slot:actions>
     </x-page-header>
 
-    <!-- Query Filter Form -->
-    <div class="bg-panel border border-line rounded-md p-4 mb-6">
-        <form method="GET" action="{{ route('historical-data') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+    <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
+    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+        <div class="flex items-center space-x-3.5">
+            <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+            <div>
+                <h2 class="text-sm font-semibold text-ink">
+                    Arsip Data Historis Siap & Terverifikasi
+                </h2>
+                <p class="text-xs text-muted mt-0.5">
+                    Menampilkan rekaman untuk perangkat <strong class="text-ink">{{ $device->name ?? 'Semua Unit' }}</strong> ({{ $granularity === 'raw' ? 'Resolusi mentah 5 detik' : ($granularity === 'daily' ? 'Agregat harian' : 'Agregat per jam') }}).
+                </p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center space-x-2">
+            <span class="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-slate-50 text-slate-700 border border-line">
+                {{ formatNumberId($summary['samples_count'] ?? 0) }} Data Poin
+            </span>
+        </div>
+    </div>
+
+    <!-- Query Filter Form Card (Smart Nursery Style) -->
+    <div class="bg-white border border-line rounded-2xl p-4 sm:p-5 mb-6 shadow-xs">
+        <form method="GET" action="{{ route('historical-data') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
             <!-- Device -->
             <div>
-                <label for="hist-device" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">{{ __('Perangkat Pelacak') }}</label>
-                <select id="hist-device" name="device" class="w-full text-xs font-medium bg-bg border border-line rounded-md px-3 py-2 text-ink focus:outline-none focus:border-accent">
-                    @foreach($devices as $dev)
-                        <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
-                            {{ $dev->name }} ({{ $dev->uid }})
-                        </option>
-                    @endforeach
-                </select>
+                <label for="hist-device" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Perangkat Pelacak') }}</label>
+                <div class="relative">
+                    <select id="hist-device" name="device" class="appearance-none w-full text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                        @foreach($devices as $dev)
+                            <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
+                                {{ $dev->name }} ({{ $dev->uid }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-muted">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
             <!-- Granularity -->
             <div>
-                <label for="hist-granularity" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">{{ __('Resolusi Data') }}</label>
-                <select id="hist-granularity" name="granularity" class="w-full text-xs font-medium bg-bg border border-line rounded-md px-3 py-2 text-ink focus:outline-none focus:border-accent">
-                    <option value="hourly" {{ $granularity === 'hourly' ? 'selected' : '' }}>{{ __('Ringkasan Per Jam (Hourly)') }}</option>
-                    <option value="daily" {{ $granularity === 'daily' ? 'selected' : '' }}>{{ __('Ringkasan Harian (Daily)') }}</option>
-                    <option value="raw" {{ $granularity === 'raw' ? 'selected' : '' }}>{{ __('Telemetri Mentah 5s (Raw)') }}</option>
-                </select>
+                <label for="hist-granularity" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Resolusi Data') }}</label>
+                <div class="relative">
+                    <select id="hist-granularity" name="granularity" class="appearance-none w-full text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                        <option value="hourly" {{ $granularity === 'hourly' ? 'selected' : '' }}>{{ __('Ringkasan Per Jam (Hourly)') }}</option>
+                        <option value="daily" {{ $granularity === 'daily' ? 'selected' : '' }}>{{ __('Ringkasan Harian (Daily)') }}</option>
+                        <option value="raw" {{ $granularity === 'raw' ? 'selected' : '' }}>{{ __('Telemetri Mentah 5s (Raw)') }}</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-muted">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
             <!-- Start Date -->
             <div>
-                <label for="hist-start-date" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">{{ __('Tanggal Mulai') }}</label>
-                <input type="date" id="hist-start-date" name="start_date" value="{{ $startDate }}" class="w-full text-xs font-mono bg-bg border border-line rounded-md px-3 py-2 text-ink focus:outline-none focus:border-accent">
+                <label for="hist-start-date" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Tanggal Mulai') }}</label>
+                <input type="date" id="hist-start-date" name="start_date" value="{{ $startDate }}" class="w-full text-xs font-mono bg-white border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
             </div>
 
             <!-- End Date -->
             <div>
-                <label for="hist-end-date" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">{{ __('Tanggal Selesai') }}</label>
-                <input type="date" id="hist-end-date" name="end_date" value="{{ $endDate }}" class="w-full text-xs font-mono bg-bg border border-line rounded-md px-3 py-2 text-ink focus:outline-none focus:border-accent">
+                <label for="hist-end-date" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Tanggal Selesai') }}</label>
+                <input type="date" id="hist-end-date" name="end_date" value="{{ $endDate }}" class="w-full text-xs font-mono bg-white border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
             </div>
 
             <!-- Submit Query Button -->
             <div>
-                <button type="submit" class="w-full inline-flex items-center justify-center h-8.5 px-4 rounded-md bg-accent hover:bg-blue-600 text-ink text-xs font-medium transition-colors cursor-pointer">
-                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button type="submit" class="w-full inline-flex items-center justify-center h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer">
+                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <span>{{ __('Kueri Rekaman') }}</span>
@@ -121,9 +155,9 @@
         @endif
     </div>
 
-    <!-- Historical Data Table -->
-    <div class="bg-panel border border-line rounded-md overflow-hidden mb-6">
-        <div class="p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <!-- Historical Data Table Card -->
+    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/40">
             <div>
                 <h3 class="text-sm font-semibold text-ink">
                     {{ __('Hasil Kueri Historis') }} ({{ $granularity === 'raw' ? __('Telemetri Mentah 5 Detik') : ($granularity === 'daily' ? __('Agregat Harian') : __('Agregat Per Jam')) }})
@@ -142,40 +176,40 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 @if($granularity === 'raw')
-                    <thead class="bg-bg/40 text-muted uppercase text-xs tracking-wider border-b border-line">
+                    <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                         <tr>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Waktu (WIB)') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Mode') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Tegangan') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Arus') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Daya') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Kumulatif Wh') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Kecepatan Angin') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Elevasi') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Azimut') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Suhu') }}</th>
+                            <th class="py-3 px-4">{{ __('Waktu (WIB)') }}</th>
+                            <th class="py-3 px-4">{{ __('Mode') }}</th>
+                            <th class="py-3 px-4">{{ __('Tegangan') }}</th>
+                            <th class="py-3 px-4">{{ __('Arus') }}</th>
+                            <th class="py-3 px-4">{{ __('Daya') }}</th>
+                            <th class="py-3 px-4">{{ __('Kumulatif Wh') }}</th>
+                            <th class="py-3 px-4">{{ __('Kecepatan Angin') }}</th>
+                            <th class="py-3 px-4">{{ __('Elevasi') }}</th>
+                            <th class="py-3 px-4">{{ __('Azimut') }}</th>
+                            <th class="py-3 px-4">{{ __('Suhu') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line font-mono text-xs">
                         @forelse($records as $row)
-                            <tr class="hover:bg-line/20 transition-colors">
-                                <td class="py-2.5 px-4 text-ink whitespace-nowrap">
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3 px-4 text-ink whitespace-nowrap">
                                     {{ $row->recorded_at ? $row->recorded_at->setTimezone('Asia/Jakarta')->translatedFormat('d M Y, H:i:s') . ' WIB' : '--' }}
                                 </td>
-                                <td class="py-2.5 px-4">
-                                    <span class="px-1.5 py-0.5 rounded text-[11px] font-mono uppercase border border-line
-                                        {{ $row->mode === 'auto' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : ($row->mode === 'stow' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-bg text-muted') }}">
+                                <td class="py-3 px-4">
+                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-mono uppercase border border-line
+                                        {{ $row->mode === 'auto' ? 'bg-blue-50 text-blue-700 border-blue-200' : ($row->mode === 'stow' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-50 text-muted') }}">
                                         {{ match(strtolower($row->mode)) { 'auto' => __('Otomatis'), 'manual' => __('Manual'), 'stow' => __('Stow'), default => strtoupper($row->mode) } }}
                                     </span>
                                 </td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->voltage, 1) : number_format($row->voltage, 1) }} V</td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->current, 2) : number_format($row->current, 2) }} A</td>
-                                <td class="py-2.5 px-4 font-bold text-accent">{{ app()->getLocale() === 'id' ? formatPowerW($row->power) : number_format($row->power, 1) . ' W' }}</td>
-                                <td class="py-2.5 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatNumberId($row->energy_wh, 0) : number_format($row->energy_wh, 0) }} Wh</td>
-                                <td class="py-2.5 px-4 {{ $row->wind_speed >= 15.0 ? 'text-danger font-bold' : 'text-ink' }}">{{ app()->getLocale() === 'id' ? formatNumberId($row->wind_speed, 1) : number_format($row->wind_speed, 1) }} m/s</td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->pitch_elev, 1) : number_format($row->pitch_elev, 1) }}&deg;</td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->azimuth, 1) : number_format($row->azimuth, 1) }}&deg;</td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->temp_c, 1) : number_format($row->temp_c, 1) }}&deg;C</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->voltage, 1) : number_format($row->voltage, 1) }} V</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->current, 2) : number_format($row->current, 2) }} A</td>
+                                <td class="py-3 px-4 font-bold text-blue-600">{{ app()->getLocale() === 'id' ? formatPowerW($row->power) : number_format($row->power, 1) . ' W' }}</td>
+                                <td class="py-3 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatNumberId($row->energy_wh, 0) : number_format($row->energy_wh, 0) }} Wh</td>
+                                <td class="py-3 px-4 {{ $row->wind_speed >= 15.0 ? 'text-rose-600 font-bold' : 'text-ink' }}">{{ app()->getLocale() === 'id' ? formatNumberId($row->wind_speed, 1) : number_format($row->wind_speed, 1) }} m/s</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->pitch_elev, 1) : number_format($row->pitch_elev, 1) }}&deg;</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->azimuth, 1) : number_format($row->azimuth, 1) }}&deg;</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->temp_c, 1) : number_format($row->temp_c, 1) }}&deg;C</td>
                             </tr>
                         @empty
                             <tr>
@@ -186,39 +220,39 @@
                         @endforelse
                     </tbody>
                 @else
-                    <thead class="bg-bg/40 text-muted uppercase text-xs tracking-wider border-b border-line">
+                    <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                         <tr>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Periode (WIB)') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Daya Rata-rata') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Daya Puncak') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Daya Min') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Delta Energi') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Angin Maks') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Angin Rata-rata') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Sampel') }}</th>
-                            <th class="py-2.5 px-4 font-medium">{{ __('Waktu Operasional') }}</th>
+                            <th class="py-3 px-4">{{ __('Periode (WIB)') }}</th>
+                            <th class="py-3 px-4">{{ __('Daya Rata-rata') }}</th>
+                            <th class="py-3 px-4">{{ __('Daya Puncak') }}</th>
+                            <th class="py-3 px-4">{{ __('Daya Min') }}</th>
+                            <th class="py-3 px-4">{{ __('Delta Energi') }}</th>
+                            <th class="py-3 px-4">{{ __('Angin Maks') }}</th>
+                            <th class="py-3 px-4">{{ __('Angin Rata-rata') }}</th>
+                            <th class="py-3 px-4">{{ __('Sampel') }}</th>
+                            <th class="py-3 px-4">{{ __('Waktu Operasional') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line font-mono text-xs">
                         @forelse($records as $row)
-                            <tr class="hover:bg-line/20 transition-colors">
-                                <td class="py-2.5 px-4 text-ink whitespace-nowrap">
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3 px-4 text-ink whitespace-nowrap">
                                     {{ $row->hour_bucket ? $row->hour_bucket->setTimezone('Asia/Jakarta')->translatedFormat('d M Y, H:00') . ' WIB' : '--' }}
                                 </td>
-                                <td class="py-2.5 px-4 font-bold text-accent">{{ app()->getLocale() === 'id' ? formatPowerW($row->avg_power_w) : number_format($row->avg_power_w, 1) . ' W' }}</td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatPowerW($row->max_power_w) : number_format($row->max_power_w, 1) . ' W' }}</td>
-                                <td class="py-2.5 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatPowerW($row->min_power_w) : number_format($row->min_power_w, 1) . ' W' }}</td>
-                                <td class="py-2.5 px-4 font-bold text-ink">
+                                <td class="py-3 px-4 font-bold text-blue-600">{{ app()->getLocale() === 'id' ? formatPowerW($row->avg_power_w) : number_format($row->avg_power_w, 1) . ' W' }}</td>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatPowerW($row->max_power_w) : number_format($row->max_power_w, 1) . ' W' }}</td>
+                                <td class="py-3 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatPowerW($row->min_power_w) : number_format($row->min_power_w, 1) . ' W' }}</td>
+                                <td class="py-3 px-4 font-bold text-ink">
                                     {{ app()->getLocale() === 'id' ? formatNumberId($row->energy_delta_wh / 1000.0, 3) : number_format($row->energy_delta_wh / 1000.0, 3) }} kWh
                                     <span class="text-[11px] text-muted font-normal">({{ app()->getLocale() === 'id' ? formatNumberId($row->energy_delta_wh, 0) : number_format($row->energy_delta_wh, 0) }} Wh)</span>
                                 </td>
-                                <td class="py-2.5 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->max_wind_ms, 1) : number_format($row->max_wind_ms, 1) }} m/s</td>
-                                <td class="py-2.5 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatNumberId($row->avg_wind_ms, 1) : number_format($row->avg_wind_ms, 1) }} m/s</td>
-                                <td class="py-2.5 px-4 text-muted">{{ $row->samples_count }}</td>
-                                <td class="py-2.5 px-4">
-                                    <span class="inline-flex items-center space-x-1 font-mono text-xs {{ $row->uptime_percent >= 90 ? 'text-ok' : 'text-warn' }}">
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $row->uptime_percent >= 90 ? 'bg-ok' : 'bg-warn' }}"></span>
-                                        <span>{{ app()->getLocale() === 'id' ? formatNumberId($row->uptime_percent, 1) : number_format($row->uptime_percent, 1) }}%</span>
+                                <td class="py-3 px-4 text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row->max_wind_ms, 1) : number_format($row->max_wind_ms, 1) }} m/s</td>
+                                <td class="py-3 px-4 text-muted">{{ app()->getLocale() === 'id' ? formatNumberId($row->avg_wind_ms, 1) : number_format($row->avg_wind_ms, 1) }} m/s</td>
+                                <td class="py-3 px-4 text-muted">{{ $row->samples_count }}</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center space-x-1 font-mono text-xs {{ $row->uptime_percent >= 90 ? 'text-emerald-600' : 'text-amber-600' }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $row->uptime_percent >= 90 ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                        <span class="font-semibold">{{ app()->getLocale() === 'id' ? formatNumberId($row->uptime_percent, 1) : number_format($row->uptime_percent, 1) }}%</span>
                                     </span>
                                 </td>
                             </tr>
@@ -235,7 +269,7 @@
         </div>
 
         @if($records->hasPages())
-            <div class="p-3 border-t border-line bg-bg/40">
+            <div class="p-4 border-t border-line bg-slate-50/40">
                 {{ $records->links() }}
             </div>
         @endif
