@@ -22,6 +22,9 @@ class TelemetrySeeder extends Seeder
 
         $now = Carbon::now('UTC');
 
+        // Clean up legacy high-power telemetry records from previous seed versions
+        Telemetry::where('power', '>', 130.5)->delete();
+
         foreach ($devices as $device) {
             $isPrimary = $device->uid === 'ST-DEMO-001';
             $powerScale = match ($device->uid) {
@@ -83,6 +86,7 @@ class TelemetrySeeder extends Seeder
 
             // 2. High-resolution telemetry for Today
             $startToday = Carbon::today('Asia/Jakarta')->setTimezone('UTC');
+            Telemetry::where('device_id', $device->id)->where('recorded_at', '>=', $startToday)->delete();
             $current = clone $startToday;
             $cumulativeEnergy = 920.0 * $powerScale;
 
