@@ -11,3 +11,4 @@ Route::prefix('v1')->group(function () {
     Route::get('/diagnostics/{uid}', [DiagnosticsController::class, 'show']);
     Route::post('/command', [CommandController::class, 'store']);
 });
+

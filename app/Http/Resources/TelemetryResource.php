@@ -39,3 +39,4 @@ class TelemetryResource extends JsonResource
         ];
     }
 }
+

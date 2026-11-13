@@ -67,3 +67,4 @@ class DiagnosticsController extends Controller
         ]);
     }
 }
+

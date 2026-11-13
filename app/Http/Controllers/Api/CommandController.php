@@ -68,3 +68,4 @@ class CommandController extends Controller
         ]);
     }
 }
+

@@ -8,3 +8,4 @@ return [
     'device_uid' => env('MQTT_DEVICE_UID', 'ST-DEMO-001'),
     'client_id' => env('MQTT_CLIENT_ID', 'sunchase-backend-'.gethostname()),
 ];
+

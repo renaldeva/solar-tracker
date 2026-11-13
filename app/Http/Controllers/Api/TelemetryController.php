@@ -39,3 +39,4 @@ class TelemetryController extends Controller
         return TelemetryResource::collection($telemetries);
     }
 }
+

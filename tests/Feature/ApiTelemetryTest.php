@@ -136,3 +136,4 @@ class ApiTelemetryTest extends TestCase
         $this->assertNotEmpty($response->json('cmd_id'));
     }
 }
+
