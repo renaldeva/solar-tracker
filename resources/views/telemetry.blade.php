@@ -217,7 +217,7 @@
                 </span>
             </div>
         </div>
-        <div class="h-80 min-h-[320px] relative">
+        <div class="relative w-full h-80 overflow-hidden">
             <canvas id="telemetryChartCanvas"></canvas>
         </div>
     </div>
@@ -384,6 +384,18 @@
                     const ctx = document.getElementById('telemetryChartCanvas');
                     if (!ctx) return;
 
+                    // Safari memory guard: ensure canvas has no leftover chart instance
+                    if (window.Chart && typeof window.Chart.getChart === 'function') {
+                        const existing = window.Chart.getChart(ctx);
+                        if (existing) {
+                            try { existing.destroy(); } catch (e) {}
+                        }
+                    }
+                    if (this.chart) {
+                        try { this.chart.destroy(); } catch (e) {}
+                        this.chart = null;
+                    }
+
                     const theme = window.getChartThemeColors ? window.getChartThemeColors() : {
                         text: '#64748b',
                         grid: '#f1f5f9',
@@ -406,6 +418,8 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            resizeDelay: 50,
+                            animation: { duration: 300 },
                             interaction: {
                                 mode: 'index',
                                 intersect: false

@@ -57,12 +57,30 @@ class EnergyMonitoringController extends Controller
         if (! $device) {
             return [
                 'has_data' => false,
-                'pzem' => ['voltage' => 0, 'current' => 0, 'power_w' => 0, 'power_kw' => 0, 'energy_wh' => 0, 'energy_kwh' => 0, 'label' => 'Solar array'],
+                'recorded_at_wib' => '--',
+                'pzem' => ['voltage' => 0.0, 'current' => 0.0, 'power_w' => 0.0, 'power_kw' => 0.0, 'energy_wh' => 0.0, 'energy_kwh' => 0.0, 'label' => 'Solar array'],
                 'daily_energy_kwh' => 0.0,
                 'monthly_energy_kwh' => 0.0,
                 'daily_target_kwh' => 50.0,
                 'progress_percent' => 0.0,
-                'subsystem' => ['temp_c' => 0, 'drift_s' => 0, 'wind_ms' => 0, 'wind_stow_ms' => 15.0, 'elev' => 0, 'target_elev' => 0, 'az' => 0, 'target_az' => 0, 'elev_state' => 'idle', 'az_state' => 'idle'],
+                'subsystem' => [
+                    'temp_c' => 0.0,
+                    'drift_s' => 0,
+                    'wind_ms' => 0.0,
+                    'wind_stow_ms' => 15.0,
+                    'wind_alert' => false,
+                    'elev' => 0.0,
+                    'target_elev' => 0.0,
+                    'az' => 0.0,
+                    'target_az' => 0.0,
+                    'elev_state' => 'idle',
+                    'az_state' => 'idle',
+                    'cal_sys' => 0,
+                    'total_dev' => 0.0,
+                    'threshold' => 1.5,
+                    'is_aligned' => true,
+                    'is_stowed' => false,
+                ],
                 'chart_24h' => ['labels' => [], 'values' => []],
                 'chart_compare' => ['labels' => [], 'today' => [], 'yesterday' => []],
             ];
@@ -201,6 +219,15 @@ class EnergyMonitoringController extends Controller
         $energyWh = $latest ? (float) $latest->energy_wh : 0.0;
         $energyKwh = round($energyWh / 1000.0, 2);
 
+        $windSpeed = $latest ? (float) $latest->wind_speed : 0.0;
+        $windAlert = $windSpeed >= $windStowThreshold;
+        $elevDev = $latest ? abs((float) $latest->pitch_elev - (float) $latest->target_elev) : 0.0;
+        $azDev = $latest ? abs((float) $latest->azimuth - (float) $latest->target_az) : 0.0;
+        $totalDev = round(sqrt(pow($elevDev, 2) + pow($azDev, 2)), 1);
+        $threshold = (float) ($settings['deadband_deg'] ?? 1.5);
+        $isAligned = $totalDev <= $threshold;
+        $isStowed = $latest && (abs((float) $latest->pitch_elev) <= 2.0 || strtolower($latest->mode ?? '') === 'stow');
+
         return [
             'has_data' => $latest !== null,
             'recorded_at_wib' => $latest?->recorded_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s T') ?? '--',
@@ -220,8 +247,9 @@ class EnergyMonitoringController extends Controller
             'subsystem' => [
                 'temp_c' => $latest ? (float) $latest->temp_c : 0.0,
                 'drift_s' => $latest ? (int) $latest->drift_s : 0,
-                'wind_ms' => $latest ? (float) $latest->wind_speed : 0.0,
+                'wind_ms' => $windSpeed,
                 'wind_stow_ms' => $windStowThreshold,
+                'wind_alert' => $windAlert,
                 'elev' => $latest ? (float) $latest->pitch_elev : 0.0,
                 'target_elev' => $latest ? (float) $latest->target_elev : 0.0,
                 'az' => $latest ? (float) $latest->azimuth : 0.0,
@@ -229,6 +257,10 @@ class EnergyMonitoringController extends Controller
                 'elev_state' => $latest->elev_state ?? 'idle',
                 'az_state' => $latest->az_state ?? 'idle',
                 'cal_sys' => $latest ? (int) $latest->cal_sys : 0,
+                'total_dev' => $totalDev,
+                'threshold' => $threshold,
+                'is_aligned' => $isAligned,
+                'is_stowed' => $isStowed,
             ],
             'chart_24h' => [
                 'labels' => $labels24h,

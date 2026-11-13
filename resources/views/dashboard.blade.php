@@ -177,7 +177,7 @@
                 </div>
 
                 <!-- Canvas Area -->
-                <div class="mt-4 flex-1 min-h-[300px] relative">
+                <div class="mt-4 relative w-full h-72 sm:h-80 overflow-hidden">
                     <canvas id="powerChartCanvas"></canvas>
                 </div>
             </div>
@@ -525,6 +525,18 @@
                     const ctx = document.getElementById('powerChartCanvas');
                     if (!ctx) return;
 
+                    // Safari memory guard: ensure canvas has no leftover chart instance
+                    if (window.Chart && typeof window.Chart.getChart === 'function') {
+                        const existing = window.Chart.getChart(ctx);
+                        if (existing) {
+                            try { existing.destroy(); } catch (e) {}
+                        }
+                    }
+                    if (this.chart) {
+                        try { this.chart.destroy(); } catch (e) {}
+                        this.chart = null;
+                    }
+
                     const dataset = this.chartData[this.activeView];
                     const initialLabel = this.activeView === 'day' 
                         ? (window.__ ? window.__('Daya (W)') : 'Daya (W)') 
@@ -560,6 +572,8 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            resizeDelay: 50,
+                            animation: { duration: 300 },
                             plugins: {
                                 legend: {
                                     display: false

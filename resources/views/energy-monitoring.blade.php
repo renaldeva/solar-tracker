@@ -213,7 +213,7 @@
                     </div>
                 </x-slot:actions>
 
-                <div class="min-h-[300px] relative">
+                <div class="relative w-full h-72 sm:h-80 overflow-hidden">
                     <canvas id="livePowerChartCanvas"></canvas>
                 </div>
             </x-card>
@@ -236,7 +236,7 @@
                     </div>
                 </x-slot:actions>
 
-                <div class="min-h-[300px] relative">
+                <div class="relative w-full h-72 sm:h-80 overflow-hidden">
                     <canvas id="compareProductionChartCanvas"></canvas>
                 </div>
             </x-card>
@@ -406,7 +406,7 @@
     <script>
         function energyMonitorComponent(initialMetrics, deviceUid) {
             return {
-                metrics: initialMetrics,
+                metrics: initialMetrics || {},
                 deviceUid: deviceUid,
                 liveChart: null,
                 compareChart: null,
@@ -418,12 +418,31 @@
                         this.initCompareChart();
                         this.startPolling();
                     });
+
+                    if (typeof this.$cleanup === 'function') {
+                        this.$cleanup(() => this.teardown());
+                    }
+                    window.addEventListener('pagehide', () => this.teardown(), { once: true });
+                    window.addEventListener('beforeunload', () => this.teardown(), { once: true });
+                },
+
+                teardown() {
+                    if (this.pollTimer) {
+                        clearInterval(this.pollTimer);
+                        this.pollTimer = null;
+                    }
+                    if (this.liveChart) {
+                        try { this.liveChart.destroy(); } catch (e) {}
+                        this.liveChart = null;
+                    }
+                    if (this.compareChart) {
+                        try { this.compareChart.destroy(); } catch (e) {}
+                        this.compareChart = null;
+                    }
                 },
 
                 destroy() {
-                    if (this.pollTimer) {
-                        clearInterval(this.pollTimer);
-                    }
+                    this.teardown();
                 },
 
                 formatPowerW(val, withUnit = true) {
@@ -438,23 +457,32 @@
                     if (!this.deviceUid) return;
 
                     fetch(`/energy-monitoring/data?device=${this.deviceUid}`)
-                        .then(res => res.json())
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network error');
+                            return res.json();
+                        })
                         .then(data => {
-                            if (!data || !data.pzem) return;
+                            if (!data || typeof data !== 'object' || !data.pzem) return;
                             this.metrics = data;
 
                             // Update grafik live 24 jam
-                            if (this.liveChart && data.chart_24h) {
+                            if (this.liveChart && data.chart_24h && Array.isArray(data.chart_24h.labels)) {
                                 this.liveChart.data.labels = data.chart_24h.labels;
-                                this.liveChart.data.datasets[0].data = data.chart_24h.values;
+                                if (this.liveChart.data.datasets && this.liveChart.data.datasets[0]) {
+                                    this.liveChart.data.datasets[0].data = data.chart_24h.values || [];
+                                }
                                 this.liveChart.update('none');
                             }
 
                             // Update grafik perbandingan hari ini vs kemarin
-                            if (this.compareChart && data.chart_compare) {
+                            if (this.compareChart && data.chart_compare && Array.isArray(data.chart_compare.labels)) {
                                 this.compareChart.data.labels = data.chart_compare.labels;
-                                this.compareChart.data.datasets[0].data = data.chart_compare.today;
-                                this.compareChart.data.datasets[1].data = data.chart_compare.yesterday;
+                                if (this.compareChart.data.datasets && this.compareChart.data.datasets[0]) {
+                                    this.compareChart.data.datasets[0].data = data.chart_compare.today || [];
+                                }
+                                if (this.compareChart.data.datasets && this.compareChart.data.datasets[1]) {
+                                    this.compareChart.data.datasets[1].data = data.chart_compare.yesterday || [];
+                                }
                                 this.compareChart.update('none');
                             }
                         })
@@ -462,7 +490,9 @@
                 },
 
                 startPolling() {
-                    // Poll setiap 5 detik sesuai requirement
+                    if (this.pollTimer) {
+                        clearInterval(this.pollTimer);
+                    }
                     this.pollTimer = setInterval(() => {
                         this.fetchLatestData();
                     }, 5000);
@@ -471,6 +501,18 @@
                 initLiveChart() {
                     const ctx = document.getElementById('livePowerChartCanvas');
                     if (!ctx) return;
+
+                    // Safari memory guard: ensure canvas has no leftover chart instance
+                    if (window.Chart && typeof window.Chart.getChart === 'function') {
+                        const existing = window.Chart.getChart(ctx);
+                        if (existing) {
+                            try { existing.destroy(); } catch (e) {}
+                        }
+                    }
+                    if (this.liveChart) {
+                        try { this.liveChart.destroy(); } catch (e) {}
+                        this.liveChart = null;
+                    }
 
                     const powerLabel = window.__ ? window.__('Daya (W)') : 'Daya (W)';
                     const themeColors = window.getChartThemeColors ? window.getChartThemeColors() : {
@@ -481,13 +523,16 @@
                         isDark: false
                     };
 
+                    const labels = this.metrics?.chart_24h?.labels || [];
+                    const values = this.metrics?.chart_24h?.values || [];
+
                     this.liveChart = new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: this.metrics.chart_24h.labels,
+                            labels: labels,
                             datasets: [{
                                 label: powerLabel,
-                                data: this.metrics.chart_24h.values,
+                                data: values,
                                 borderColor: themeColors.primary,
                                 borderWidth: 2.5,
                                 backgroundColor: themeColors.primaryFill,
@@ -503,6 +548,8 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            resizeDelay: 50,
+                            animation: { duration: 300 },
                             plugins: {
                                 legend: { display: false },
                                 tooltip: {
@@ -543,6 +590,18 @@
                     const ctx = document.getElementById('compareProductionChartCanvas');
                     if (!ctx) return;
 
+                    // Safari memory guard: ensure canvas has no leftover chart instance
+                    if (window.Chart && typeof window.Chart.getChart === 'function') {
+                        const existing = window.Chart.getChart(ctx);
+                        if (existing) {
+                            try { existing.destroy(); } catch (e) {}
+                        }
+                    }
+                    if (this.compareChart) {
+                        try { this.compareChart.destroy(); } catch (e) {}
+                        this.compareChart = null;
+                    }
+
                     const todayLabel = window.__ ? window.__('Hari Ini (kWh)') : 'Hari Ini (kWh)';
                     const yesterdayLabel = window.__ ? window.__('Kemarin (kWh)') : 'Kemarin (kWh)';
                     const themeColors = window.getChartThemeColors ? window.getChartThemeColors() : {
@@ -552,21 +611,25 @@
                         text: '#64748b'
                     };
 
+                    const labels = this.metrics?.chart_compare?.labels || [];
+                    const todayData = this.metrics?.chart_compare?.today || [];
+                    const yesterdayData = this.metrics?.chart_compare?.yesterday || [];
+
                     this.compareChart = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: this.metrics.chart_compare.labels,
+                            labels: labels,
                             datasets: [
                                 {
                                     label: todayLabel,
-                                    data: this.metrics.chart_compare.today,
+                                    data: todayData,
                                     backgroundColor: themeColors.barNew,
                                     borderRadius: 6,
                                     barPercentage: 0.6,
                                 },
                                 {
                                     label: yesterdayLabel,
-                                    data: this.metrics.chart_compare.yesterday,
+                                    data: yesterdayData,
                                     backgroundColor: themeColors.barOld,
                                     borderRadius: 6,
                                     barPercentage: 0.6,
@@ -576,6 +639,8 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            resizeDelay: 50,
+                            animation: { duration: 300 },
                             plugins: {
                                 legend: { display: false },
                                 tooltip: {
