@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import Chart from 'chart.js/auto';
+import './chart-theme';
 
 window.Alpine = Alpine;
 window.Chart = Chart;
@@ -44,24 +45,6 @@ window.formatNumberId = function (val, decimals = 1) {
         maximumFractionDigits: decimals,
     }).format(Number(val));
 };
-
-// Set Chart.js defaults for typography and readability
-if (Chart && Chart.defaults) {
-    Chart.defaults.font.family = "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
-    Chart.defaults.font.size = 13;
-    Chart.defaults.color = '#475569';
-    if (Chart.defaults.plugins) {
-        if (Chart.defaults.plugins.legend && Chart.defaults.plugins.legend.labels) {
-            Chart.defaults.plugins.legend.labels.font = { size: 14, family: "'Inter', sans-serif" };
-            Chart.defaults.plugins.legend.labels.color = '#334155';
-        }
-        if (Chart.defaults.plugins.tooltip) {
-            Chart.defaults.plugins.tooltip.titleFont = { size: 13, weight: '600' };
-            Chart.defaults.plugins.tooltip.bodyFont = { size: 13 };
-            Chart.defaults.plugins.tooltip.padding = 10;
-        }
-    }
-}
 
 // Global helper for WIB live clock (Indonesian format)
 window.wibClock = function () {
