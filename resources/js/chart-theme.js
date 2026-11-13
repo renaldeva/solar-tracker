@@ -1,12 +1,13 @@
 import Chart from 'chart.js/auto';
 
 /**
- * Grafana-style dark theme defaults for Chart.js
- * - Background transparan
- * - Grid halus (#374151)
- * - Font JetBrains Mono untuk angka/ticks
- * - Garis 2px
- * - Titik tersembunyi (muncul saat hover)
+ * Smart Nursery Light Theme defaults for Chart.js
+ * - Clean light aesthetic
+ * - Transparent background
+ * - Very subtle grid (#f1f5f9 / rgba(226, 232, 240, 0.6))
+ * - Blue palette: #2563eb (newest/primary), #93c5fd / #dbeafe (older/history)
+ * - Rounded bars, smooth lines, points hidden until hover
+ * - Pill-shaped legend
  */
 export function applyChartTheme(ChartInstance = Chart) {
     if (!ChartInstance || !ChartInstance.defaults) {
@@ -16,9 +17,9 @@ export function applyChartTheme(ChartInstance = Chart) {
     const d = ChartInstance.defaults;
 
     // Typography
-    d.font.family = "'JetBrains Mono', monospace";
+    d.font.family = "'JetBrains Mono', 'Inter', monospace";
     d.font.size = 11;
-    d.color = '#9ca3af'; // muted
+    d.color = '#64748b'; // muted secondary text
 
     // Responsive & Layout
     d.responsive = true;
@@ -30,18 +31,19 @@ export function applyChartTheme(ChartInstance = Chart) {
     if (!d.elements.point) d.elements.point = {};
     if (!d.elements.bar) d.elements.bar = {};
 
-    d.elements.line.borderWidth = 2;
-    d.elements.line.tension = 0.25;
+    d.elements.line.borderWidth = 2.5;
+    d.elements.line.tension = 0.35;
     d.elements.line.fill = false;
 
-    // Titik tersembunyi, muncul saat hover
+    // Points hidden by default, visible on hover
     d.elements.point.radius = 0;
-    d.elements.point.hoverRadius = 4;
-    d.elements.point.hitRadius = 8;
-    d.elements.point.borderWidth = 1.5;
+    d.elements.point.hoverRadius = 5;
+    d.elements.point.hitRadius = 10;
+    d.elements.point.borderWidth = 2;
+    d.elements.point.backgroundColor = '#ffffff';
 
     // Bar elements
-    d.elements.bar.borderRadius = 4;
+    d.elements.bar.borderRadius = 6;
     d.elements.bar.borderWidth = 0;
 
     // Scales (Grid & Axes)
@@ -53,15 +55,14 @@ export function applyChartTheme(ChartInstance = Chart) {
         scale.ticks = scale.ticks || {};
         scale.border = scale.border || {};
 
-        scale.grid.color = 'rgba(55, 65, 81, 0.45)'; // subtle line color
+        scale.grid.color = 'rgba(226, 232, 240, 0.7)'; // soft border line
         scale.grid.drawBorder = false;
-        scale.ticks.color = '#9ca3af';
+        scale.border.display = false;
+        scale.ticks.color = '#64748b';
         scale.ticks.font = {
             family: "'JetBrains Mono', monospace",
             size: 11,
         };
-        scale.border.color = '#374151';
-        scale.border.width = 1;
     };
 
     if (d.scale) applyScaleDefaults(d.scale);
@@ -69,16 +70,16 @@ export function applyChartTheme(ChartInstance = Chart) {
     // Plugins: Tooltip, Legend
     if (!d.plugins) d.plugins = {};
 
-    // Tooltip - Grafana dark panel style
+    // Tooltip - Clean rounded dark contrast or crisp light
     if (!d.plugins.tooltip) d.plugins.tooltip = {};
     d.plugins.tooltip.enabled = true;
-    d.plugins.tooltip.backgroundColor = '#1f2937'; // panel
-    d.plugins.tooltip.titleColor = '#f9fafb';       // ink
-    d.plugins.tooltip.bodyColor = '#f9fafb';        // ink
-    d.plugins.tooltip.borderColor = '#374151';      // line
-    d.plugins.tooltip.borderWidth = 1;
+    d.plugins.tooltip.backgroundColor = '#0f172a'; // crisp dark tooltip for contrast
+    d.plugins.tooltip.titleColor = '#ffffff';
+    d.plugins.tooltip.bodyColor = '#f8fafc';
+    d.plugins.tooltip.borderColor = '#e2e8f0';
+    d.plugins.tooltip.borderWidth = 0;
     d.plugins.tooltip.padding = 10;
-    d.plugins.tooltip.cornerRadius = 6;
+    d.plugins.tooltip.cornerRadius = 8;
     d.plugins.tooltip.displayColors = true;
     d.plugins.tooltip.boxWidth = 8;
     d.plugins.tooltip.boxHeight = 8;
@@ -93,11 +94,11 @@ export function applyChartTheme(ChartInstance = Chart) {
         size: 12,
     };
 
-    // Legend
+    // Legend - pill style
     if (!d.plugins.legend) d.plugins.legend = {};
     d.plugins.legend.display = true;
     if (!d.plugins.legend.labels) d.plugins.legend.labels = {};
-    d.plugins.legend.labels.color = '#9ca3af';
+    d.plugins.legend.labels.color = '#0f172a';
     d.plugins.legend.labels.usePointStyle = true;
     d.plugins.legend.labels.pointStyle = 'circle';
     d.plugins.legend.labels.boxWidth = 8;
@@ -114,4 +115,3 @@ export function applyChartTheme(ChartInstance = Chart) {
 applyChartTheme(Chart);
 
 export default applyChartTheme;
-

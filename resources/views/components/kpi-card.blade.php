@@ -22,71 +22,101 @@
 
     $toneConfig = match ($effectiveTone) {
         'ok' => [
-            'border' => 'border-ok/30',
-            'bg' => 'bg-ok/10',
-            'text' => 'text-ok',
-            'dot' => 'bg-ok',
+            'border' => 'border-emerald-200',
+            'bg' => 'bg-emerald-50',
+            'text' => 'text-emerald-700',
+            'dot' => 'bg-emerald-500',
+            'iconBg' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
         ],
         'warn' => [
-            'border' => 'border-warn/30',
-            'bg' => 'bg-warn/10',
-            'text' => 'text-warn',
-            'dot' => 'bg-warn',
+            'border' => 'border-amber-200',
+            'bg' => 'bg-amber-50',
+            'text' => 'text-amber-700',
+            'dot' => 'bg-amber-500',
+            'iconBg' => 'bg-amber-50 text-amber-600 border-amber-100',
         ],
         'danger' => [
-            'border' => 'border-danger/30',
-            'bg' => 'bg-danger/10',
-            'text' => 'text-danger',
-            'dot' => 'bg-danger',
+            'border' => 'border-rose-200',
+            'bg' => 'bg-rose-50',
+            'text' => 'text-rose-700',
+            'dot' => 'bg-rose-500',
+            'iconBg' => 'bg-rose-50 text-rose-600 border-rose-100',
         ],
         'neutral' => [
-            'border' => 'border-line',
-            'bg' => 'bg-line/20',
-            'text' => 'text-muted',
-            'dot' => 'bg-muted',
+            'border' => 'border-slate-200',
+            'bg' => 'bg-slate-50',
+            'text' => 'text-slate-600',
+            'dot' => 'bg-slate-400',
+            'iconBg' => 'bg-slate-50 text-slate-500 border-slate-100',
         ],
         default => [
-            'border' => 'border-accent/30',
-            'bg' => 'bg-accent/10',
-            'text' => 'text-accent',
-            'dot' => 'bg-accent',
+            'border' => 'border-blue-200',
+            'bg' => 'bg-blue-50',
+            'text' => 'text-blue-700',
+            'dot' => 'bg-blue-600',
+            'iconBg' => 'bg-blue-50 text-blue-600 border-blue-100',
         ],
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'bg-panel rounded-md border border-line p-4 flex flex-col justify-between']) }}>
+<div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-line p-5 flex flex-col justify-between hover:border-blue-200 transition-colors']) }}>
+    <!-- Header: Label kecil di kiri atas, icon di kotak bersudut bulat berlatar biru muda di kanan atas -->
     <div class="flex items-start justify-between gap-2 mb-2">
-        <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __($title) }}</span>
-        @if($badge)
-            <span class="shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border {{ $toneConfig['border'] }} {{ $toneConfig['bg'] }} {{ $toneConfig['text'] }}">
-                <span class="w-1.5 h-1.5 rounded-full {{ $toneConfig['dot'] }}"></span>
-                <span>{{ $badge }}</span>
+        <span class="text-xs font-semibold text-muted uppercase tracking-wider truncate">{{ __($title) }}</span>
+        
+        <div class="flex items-center gap-1.5 shrink-0">
+            @if($badge)
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border {{ $toneConfig['border'] }} {{ $toneConfig['bg'] }} {{ $toneConfig['text'] }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $toneConfig['dot'] }}"></span>
+                    <span>{{ $badge }}</span>
+                </span>
+            @endif
+
+            @if($icon)
+                <div class="w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 {{ $toneConfig['iconBg'] }}">
+                    <div class="w-4 h-4 flex items-center justify-center">
+                        {!! $icon !!}
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Nilai KPI besar ~32px dengan satuan kecil -->
+    <div class="my-1">
+        <div class="flex items-baseline gap-1">
+            <span class="text-2xl sm:text-3xl font-bold text-ink font-mono tabular-nums tracking-tight">
+                {{ $value }}
             </span>
-        @elseif($icon)
-            <div class="text-muted shrink-0">
-                {!! $icon !!}
+            @if($unit)
+                <span class="text-sm font-semibold text-muted font-mono">
+                    {{ $unit }}
+                </span>
+            @endif
+        </div>
+    </div>
+
+    <!-- Keterangan bahasa awam di bawah & sparkline/slot -->
+    <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-muted">
+        @if($subtitle)
+            <div class="truncate text-slate-500 font-normal">
+                {{ __($subtitle) }}
+            </div>
+        @endif
+
+        @if($trend)
+            <div class="inline-flex items-center gap-1 font-mono font-medium shrink-0 ml-auto {{ $trendUp ? 'text-emerald-600' : 'text-rose-600' }}">
+                <svg class="w-3.5 h-3.5 {{ $trendUp ? '' : 'rotate-180' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                <span>{{ $trend }}</span>
             </div>
         @endif
     </div>
 
-    <div class="flex items-baseline gap-1 my-1">
-        <span class="text-3xl font-bold font-mono tabular-nums text-ink tracking-tight">{{ $value }}</span>
-        @if($unit)
-            <span class="text-xs font-mono text-muted font-normal">{{ $unit }}</span>
-        @endif
-    </div>
-
-    @if($subtitle || $trend)
-        <div class="mt-2 pt-2 border-t border-line/50 flex items-center text-xs text-muted">
-            @if($trend)
-                <span class="inline-flex items-center font-mono font-medium mr-2 {{ $trendUp ? 'text-ok' : 'text-danger' }}">
-                    <span class="mr-1">{{ $trendUp ? '▲' : '▼' }}</span>
-                    {{ $trend }}
-                </span>
-            @endif
-            @if($subtitle)
-                <span class="truncate">{{ __($subtitle) }}</span>
-            @endif
+    @if($slot->isNotEmpty())
+        <div class="mt-2.5">
+            {{ $slot }}
         </div>
     @endif
 </div>
