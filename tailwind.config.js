@@ -10,28 +10,28 @@ export default {
     theme: {
         extend: {
             colors: {
-                bg: '#f8fafc',
-                panel: '#ffffff',
-                'panel-alt': '#f1f5f9',
-                line: '#e5e7eb',
-                ink: '#0f172a',
-                muted: '#64748b',
+                bg: 'var(--theme-bg)',
+                panel: 'var(--theme-panel)',
+                'panel-alt': 'var(--theme-panel-alt)',
+                line: 'var(--theme-line)',
+                ink: 'var(--theme-ink)',
+                muted: 'var(--theme-muted)',
                 accent: {
-                    DEFAULT: '#2563eb',
-                    mid: '#dbeafe',
-                    light: '#eff6ff',
+                    DEFAULT: 'var(--theme-accent)',
+                    mid: 'var(--theme-accent-mid)',
+                    light: 'var(--theme-accent-light)',
                 },
                 ok: {
-                    DEFAULT: '#10b981',
-                    light: '#ecfdf5',
+                    DEFAULT: 'var(--theme-ok)',
+                    light: 'var(--theme-ok-light)',
                 },
                 warn: {
-                    DEFAULT: '#f59e0b',
-                    light: '#fffbeb',
+                    DEFAULT: 'var(--theme-warn)',
+                    light: 'var(--theme-warn-light)',
                 },
                 danger: {
-                    DEFAULT: '#ef4444',
-                    light: '#fef2f2',
+                    DEFAULT: 'var(--theme-danger)',
+                    light: 'var(--theme-danger-light)',
                 },
             },
             fontFamily: {

@@ -15,23 +15,23 @@
             </thead>
             <tbody class="divide-y divide-line text-ink">
                 @forelse($recentTelemetries as $log)
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="hover:bg-panel-alt/50 transition-colors">
                         <td class="py-3 pr-3 text-muted whitespace-nowrap font-mono">
                             {{ formatTimeWib($log->recorded_at) }}
                         </td>
-                        <td class="py-3 px-3 font-semibold text-blue-600 whitespace-nowrap font-mono">
+                        <td class="py-3 px-3 font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap font-mono">
                             {{ formatNumberId($log->pitch_elev, 1) }}&deg;
-                            <span class="text-muted font-normal text-slate-400">/ {{ formatNumberId($log->target_elev, 1) }}&deg;</span>
+                            <span class="text-muted font-normal">/ {{ formatNumberId($log->target_elev, 1) }}&deg;</span>
                         </td>
-                        <td class="py-3 px-3 font-semibold text-blue-600 whitespace-nowrap font-mono">
+                        <td class="py-3 px-3 font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap font-mono">
                             {{ formatNumberId($log->azimuth, 1) }}&deg;
-                            <span class="text-muted font-normal text-slate-400">/ {{ formatNumberId($log->target_az, 1) }}&deg;</span>
+                            <span class="text-muted font-normal">/ {{ formatNumberId($log->target_az, 1) }}&deg;</span>
                         </td>
                         <td class="py-3 px-3 font-medium whitespace-nowrap font-mono">
-                            {{ formatNumberId($log->voltage, 1) }} V &middot; <span class="text-blue-600 font-semibold">{{ formatPowerW($log->power) }}</span>
+                            {{ formatNumberId($log->voltage, 1) }} V &middot; <span class="text-blue-600 dark:text-blue-400 font-semibold">{{ formatPowerW($log->power) }}</span>
                         </td>
                         <td class="py-3 px-3 whitespace-nowrap">
-                            <span class="inline-block px-2 py-0.5 rounded-full border border-slate-200 bg-slate-100 text-slate-700 text-[11px] font-medium capitalize">
+                            <span class="inline-block px-2 py-0.5 rounded-full border border-line bg-panel-alt text-ink text-[11px] font-medium capitalize">
                                 {{ $log->elev_state }}/{{ $log->az_state }}
                             </span>
                         </td>

@@ -21,9 +21,9 @@
     </x-page-header>
 
     <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
-    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+    <div class="mb-6 p-4 rounded-2xl bg-panel border border-line shadow-xs flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
-            <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+            <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-950/50"></div>
             <div>
                 <h2 class="text-sm font-semibold text-ink">
                     Laporan Produksi Energi Terverifikasi
@@ -34,20 +34,20 @@
             </div>
         </div>
         <div class="hidden sm:flex items-center space-x-2">
-            <span class="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <span class="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                 {{ $reportType === 'daily' ? 'HARIAN' : 'BULANAN' }}
             </span>
         </div>
     </div>
 
     <!-- Report Criteria Card (Smart Nursery Style) -->
-    <div class="bg-white border border-line rounded-2xl p-4 sm:p-5 mb-6 shadow-xs">
+    <div class="bg-panel border border-line rounded-2xl p-4 sm:p-5 mb-6 shadow-xs">
         <form method="GET" action="{{ route('reports') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
             <!-- Report Type -->
             <div>
                 <label for="rep-type" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Tipe Laporan') }}</label>
                 <div class="relative">
-                    <select id="rep-type" name="type" onchange="this.form.submit()" class="appearance-none w-full text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <select id="rep-type" name="type" onchange="this.form.submit()" class="appearance-none w-full text-xs font-semibold bg-panel border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                         <option value="daily" {{ $reportType === 'daily' ? 'selected' : '' }}>{{ __('Ringkasan Energi Harian') }}</option>
                         <option value="monthly" {{ $reportType === 'monthly' ? 'selected' : '' }}>{{ __('Audit Produksi Bulanan') }}</option>
                     </select>
@@ -63,12 +63,12 @@
             @if($reportType === 'daily')
                 <div>
                     <label for="rep-date" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Tanggal Target') }}</label>
-                    <input type="date" id="rep-date" name="date" value="{{ $selectedDate }}" class="w-full text-xs font-mono bg-white border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="date" id="rep-date" name="date" value="{{ $selectedDate }}" class="w-full text-xs font-mono bg-panel border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
             @else
                 <div>
                     <label for="rep-month" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Bulan Target') }}</label>
-                    <input type="month" id="rep-month" name="month" value="{{ $selectedMonth }}" class="w-full text-xs font-mono bg-white border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="month" id="rep-month" name="month" value="{{ $selectedMonth }}" class="w-full text-xs font-mono bg-panel border border-line rounded-xl px-3 py-2 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
             @endif
 
@@ -76,7 +76,7 @@
             <div>
                 <label for="rep-site" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Lokasi Fasilitas') }}</label>
                 <div class="relative">
-                    <select id="rep-site" name="site_id" class="appearance-none w-full text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <select id="rep-site" name="site_id" class="appearance-none w-full text-xs font-semibold bg-panel border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                         <option value="">{{ __('Semua Fasilitas') }}</option>
                         @foreach($sites as $site)
                             <option value="{{ $site->id }}" {{ $selectedSiteId == $site->id ? 'selected' : '' }}>{{ $site->name }}</option>
@@ -94,7 +94,7 @@
             <div>
                 <label for="rep-device" class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Perangkat Khusus') }}</label>
                 <div class="relative">
-                    <select id="rep-device" name="device_id" class="appearance-none w-full text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <select id="rep-device" name="device_id" class="appearance-none w-full text-xs font-semibold bg-panel border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                         <option value="">{{ __('Semua Perangkat') }}</option>
                         @foreach($devices as $dev)
                             <option value="{{ $dev->id }}" {{ $selectedDeviceId == $dev->id ? 'selected' : '' }}>{{ $dev->name }} ({{ $dev->uid }})</option>
@@ -155,8 +155,8 @@
     </div>
 
     <!-- Report Table Card (Smart Nursery Style) -->
-    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
-        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/40">
+    <div class="bg-panel border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-panel-alt/60">
             <div>
                 <h3 class="text-sm font-semibold text-ink">
                     {{ __('Pernyataan Kinerja') }}: {{ $reportType === 'daily' ? __('Hari') . ' ' . $selectedDate : __('Bulan') . ' ' . $selectedMonth }}
@@ -170,7 +170,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
+                <thead class="bg-panel-alt text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
                         <th class="py-3 px-4">{{ __('Periode') }}</th>
                         <th class="py-3 px-4">{{ __('Perangkat Pelacak') }}</th>
@@ -186,19 +186,19 @@
                 </thead>
                 <tbody class="divide-y divide-line font-mono text-xs">
                     @forelse($rows as $row)
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        <tr class="hover:bg-panel-alt/50 transition-colors">
                             <td class="py-3.5 px-4 text-ink whitespace-nowrap">{{ $row['period_label'] }}</td>
                             <td class="py-3.5 px-4">
                                 <div class="font-semibold text-ink font-sans">{{ $row['device_name'] }}</div>
                                 <div class="text-[11px] text-muted">{{ $row['device_uid'] }}</div>
                             </td>
                             <td class="py-3.5 px-4 font-sans text-muted">{{ $row['site_name'] }}</td>
-                            <td class="py-3.5 px-4 font-bold text-blue-600">
+                            <td class="py-3.5 px-4 font-bold text-blue-600 dark:text-blue-400">
                                 {{ app()->getLocale() === 'id' ? formatNumberId($row['energy_kwh'], 2) : number_format($row['energy_kwh'], 2) }} kWh
                             </td>
                             <td class="py-3.5 px-4">
                                 <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-slate-100 border border-line rounded-full h-2 overflow-hidden">
+                                    <div class="w-16 bg-panel-alt border border-line rounded-full h-2 overflow-hidden">
                                         <div class="bg-blue-600 h-full rounded-full" style="width: {{ min(100, $row['progress_percent']) }}%"></div>
                                     </div>
                                     <span class="text-[11px] font-semibold text-ink">{{ app()->getLocale() === 'id' ? formatNumberId($row['progress_percent'], 1) : number_format($row['progress_percent'], 1) }}%</span>
@@ -210,17 +210,17 @@
                             <td class="py-3.5 px-4 text-muted">
                                 {{ app()->getLocale() === 'id' ? formatPowerW($row['avg_power_w'] ?? 0) : number_format($row['avg_power_w'] ?? 0, 1) . ' W' }}
                             </td>
-                            <td class="py-3.5 px-4 {{ $row['max_wind_ms'] >= 15.0 ? 'text-rose-600 font-bold' : 'text-ink' }}">
+                            <td class="py-3.5 px-4 {{ $row['max_wind_ms'] >= 15.0 ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-ink' }}">
                                 {{ app()->getLocale() === 'id' ? formatNumberId($row['max_wind_ms'], 1) : number_format($row['max_wind_ms'], 1) }} m/s
                             </td>
                             <td class="py-3.5 px-4">
-                                <span class="inline-flex items-center space-x-1 {{ $row['uptime_percent'] >= 90 ? 'text-emerald-600' : 'text-amber-600' }}">
+                                <span class="inline-flex items-center space-x-1 {{ $row['uptime_percent'] >= 90 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ $row['uptime_percent'] >= 90 ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
                                     <span class="font-semibold">{{ app()->getLocale() === 'id' ? formatNumberId($row['uptime_percent'], 1) : number_format($row['uptime_percent'], 1) }}%</span>
                                 </span>
                             </td>
                             <td class="py-3.5 px-4 text-right">
-                                <span class="px-2 py-0.5 rounded-md text-[11px] font-mono border {{ $row['alerts_count'] > 0 ? 'border-amber-200 text-amber-700 bg-amber-50 font-semibold' : 'border-line text-muted bg-slate-50' }}">
+                                <span class="px-2 py-0.5 rounded-md text-[11px] font-mono border {{ $row['alerts_count'] > 0 ? 'border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-semibold' : 'border-line text-muted bg-panel-alt' }}">
                                     {{ $row['alerts_count'] }}
                                 </span>
                             </td>
@@ -228,7 +228,7 @@
                     @empty
                         <tr>
                             <td colspan="10" class="p-8 text-center text-muted font-sans text-sm">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-100 text-muted mx-auto flex items-center justify-center mb-3">
+                                <div class="w-12 h-12 rounded-2xl bg-panel-alt text-muted mx-auto flex items-center justify-center mb-3">
                                     <svg class="w-6 h-6 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>

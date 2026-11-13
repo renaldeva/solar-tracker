@@ -78,4 +78,77 @@ window.wibClock = function () {
     };
 };
 
+// Global Theme Manager (Light, Dark, System)
+window.themeManager = {
+    theme: 'system', // 'light' | 'dark' | 'system'
+    isDark: false,
+    open: false,
+    init() {
+        try {
+            this.theme = localStorage.getItem('theme') || 'system';
+        } catch (e) {
+            this.theme = 'system';
+        }
+        this.apply();
+
+        // Listen for OS system theme changes
+        if (window.matchMedia) {
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            const listener = () => {
+                if (this.theme === 'system') {
+                    this.apply();
+                }
+            };
+            if (media.addEventListener) {
+                media.addEventListener('change', listener);
+            } else if (media.addListener) {
+                media.addListener(listener);
+            }
+        }
+    },
+    setTheme(val) {
+        this.theme = val;
+        try {
+            localStorage.setItem('theme', val);
+        } catch (e) {}
+        this.apply();
+        this.open = false;
+    },
+    apply() {
+        let dark = false;
+        if (this.theme === 'dark') {
+            dark = true;
+        } else if (this.theme === 'light') {
+            dark = false;
+        } else {
+            dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        this.isDark = dark;
+        if (dark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        window.dispatchEvent(new CustomEvent('theme-changed', {
+            detail: { theme: this.theme, isDark: dark }
+        }));
+    }
+};
+
+// Initialize theme manager immediately
+window.themeManager.init();
+
+// Alpine component for theme dropdown
+window.themeDropdown = function () {
+    return {
+        get open() { return window.themeManager.open; },
+        set open(val) { window.themeManager.open = val; },
+        get theme() { return window.themeManager.theme; },
+        get isDark() { return window.themeManager.isDark; },
+        setTheme(val) {
+            window.themeManager.setTheme(val);
+        }
+    };
+};
+
 Alpine.start();

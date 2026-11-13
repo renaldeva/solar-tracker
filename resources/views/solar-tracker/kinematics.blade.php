@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- 1. Elevation Pitch Plane SVG -->
     <x-card :title="__('Elevation Pitch Kinematics')" :subtitle="__('Kemiringan panel surya dari 0° (Mendatar) hingga 90° (Tegak Lurus)')">
-        <div class="relative bg-slate-50/70 rounded-xl p-4 overflow-hidden border border-line flex flex-col items-center">
+        <div class="relative bg-panel-alt/60 rounded-xl p-4 overflow-hidden border border-line flex flex-col items-center">
             <!-- SVG Elevation Diagram -->
             <svg class="w-full h-60 max-w-md" viewBox="0 0 300 200" fill="none">
                 <!-- Ground Level & Pedestal -->
@@ -51,17 +51,17 @@
 
             <!-- Elevation Digital Overlays -->
             <div class="w-full grid grid-cols-3 gap-2.5 mt-3 pt-3 border-t border-line text-center">
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Saat Ini') }}</div>
-                    <div class="text-sm sm:text-base font-bold text-blue-600 font-mono mt-0.5">{{ formatNumberId($elevCurrent, 1) }}&deg;</div>
+                    <div class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 font-mono mt-0.5">{{ formatNumberId($elevCurrent, 1) }}&deg;</div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Target Matahari') }}</div>
-                    <div class="text-sm sm:text-base font-bold text-amber-600 font-mono mt-0.5">{{ formatNumberId($elevTarget, 1) }}&deg;</div>
+                    <div class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 font-mono mt-0.5">{{ formatNumberId($elevTarget, 1) }}&deg;</div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Deviasi') }}</div>
-                    <div class="text-sm sm:text-base font-bold font-mono {{ abs($elevDeviation) <= 2.5 ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5">
+                    <div class="text-sm sm:text-base font-bold font-mono {{ abs($elevDeviation) <= 2.5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }} mt-0.5">
                         {{ ($elevDeviation >= 0 ? '+' : '') . formatNumberId($elevDeviation, 1) }}&deg;
                     </div>
                 </div>
@@ -71,7 +71,7 @@
 
     <!-- 2. Azimuth 360° Compass Compass Rose SVG -->
     <x-card :title="__('360° Azimuth Compass Dial')" :subtitle="__('Putaran horizontal panel dari Utara (0°) ke Timur (90°), Selatan (180°), dan Barat (270°)')">
-        <div class="relative bg-slate-50/70 rounded-xl p-4 overflow-hidden border border-line flex flex-col items-center">
+        <div class="relative bg-panel-alt/60 rounded-xl p-4 overflow-hidden border border-line flex flex-col items-center">
             <!-- 360 Degree Azimuth SVG -->
             <svg class="w-full h-60 max-w-md" viewBox="0 0 300 200" fill="none">
                 <!-- Outer Compass Ring -->
@@ -115,17 +115,17 @@
 
             <!-- Azimuth Digital Overlays -->
             <div class="w-full grid grid-cols-3 gap-2.5 mt-3 pt-3 border-t border-line text-center">
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Saat Ini') }}</div>
-                    <div class="text-sm sm:text-base font-bold text-blue-600 font-mono mt-0.5">{{ formatNumberId($azCurrent, 1) }}&deg;</div>
+                    <div class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 font-mono mt-0.5">{{ formatNumberId($azCurrent, 1) }}&deg;</div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Target Matahari') }}</div>
-                    <div class="text-sm sm:text-base font-bold text-amber-600 font-mono mt-0.5">{{ formatNumberId($azTarget, 1) }}&deg;</div>
+                    <div class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 font-mono mt-0.5">{{ formatNumberId($azTarget, 1) }}&deg;</div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-line shadow-2xs">
+                <div class="bg-panel p-2.5 rounded-xl border border-line shadow-2xs">
                     <div class="text-[10px] font-semibold text-muted uppercase tracking-wider">{{ __('Deviasi') }}</div>
-                    <div class="text-sm sm:text-base font-bold font-mono {{ abs($azDeviation) <= 2.5 ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5">
+                    <div class="text-sm sm:text-base font-bold font-mono {{ abs($azDeviation) <= 2.5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }} mt-0.5">
                         {{ ($azDeviation >= 0 ? '+' : '') . formatNumberId($azDeviation, 1) }}&deg;
                     </div>
                 </div>

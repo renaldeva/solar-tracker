@@ -4,12 +4,12 @@
     'icon' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-line overflow-hidden']) }}>
+<div {{ $attributes->merge(['class' => 'bg-panel rounded-2xl border border-line overflow-hidden']) }}>
     @if($title || isset($header) || isset($actions))
         <div class="px-5 py-4 border-b border-line flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
                 @if($icon)
-                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/60 flex items-center justify-center shrink-0">
                         <div class="w-4 h-4 flex items-center justify-center">
                             {!! $icon !!}
                         </div>
@@ -40,7 +40,7 @@
     </div>
 
     @if(isset($footer))
-        <div class="px-5 py-3 bg-slate-50/70 border-t border-line text-xs text-muted">
+        <div class="px-5 py-3 bg-panel-alt/70 border-t border-line text-xs text-muted">
             {{ $footer }}
         </div>
     @endif

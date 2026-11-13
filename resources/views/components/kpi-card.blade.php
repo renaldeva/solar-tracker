@@ -22,45 +22,45 @@
 
     $toneConfig = match ($effectiveTone) {
         'ok' => [
-            'border' => 'border-emerald-200',
-            'bg' => 'bg-emerald-50',
-            'text' => 'text-emerald-700',
+            'border' => 'border-emerald-200 dark:border-emerald-800/60',
+            'bg' => 'bg-emerald-50 dark:bg-emerald-950/40',
+            'text' => 'text-emerald-700 dark:text-emerald-400',
             'dot' => 'bg-emerald-500',
-            'iconBg' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
+            'iconBg' => 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60',
         ],
         'warn' => [
-            'border' => 'border-amber-200',
-            'bg' => 'bg-amber-50',
-            'text' => 'text-amber-700',
+            'border' => 'border-amber-200 dark:border-amber-800/60',
+            'bg' => 'bg-amber-50 dark:bg-amber-950/40',
+            'text' => 'text-amber-700 dark:text-amber-400',
             'dot' => 'bg-amber-500',
-            'iconBg' => 'bg-amber-50 text-amber-600 border-amber-100',
+            'iconBg' => 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/60',
         ],
         'danger' => [
-            'border' => 'border-rose-200',
-            'bg' => 'bg-rose-50',
-            'text' => 'text-rose-700',
+            'border' => 'border-rose-200 dark:border-rose-800/60',
+            'bg' => 'bg-rose-50 dark:bg-rose-950/40',
+            'text' => 'text-rose-700 dark:text-rose-400',
             'dot' => 'bg-rose-500',
-            'iconBg' => 'bg-rose-50 text-rose-600 border-rose-100',
+            'iconBg' => 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/60',
         ],
         'neutral' => [
-            'border' => 'border-slate-200',
-            'bg' => 'bg-slate-50',
-            'text' => 'text-slate-600',
+            'border' => 'border-slate-200 dark:border-slate-700',
+            'bg' => 'bg-slate-50 dark:bg-slate-800/40',
+            'text' => 'text-slate-600 dark:text-slate-400',
             'dot' => 'bg-slate-400',
-            'iconBg' => 'bg-slate-50 text-slate-500 border-slate-100',
+            'iconBg' => 'bg-slate-50 text-slate-500 border-slate-100 dark:bg-slate-800/40 dark:text-slate-400 dark:border-slate-700',
         ],
         default => [
-            'border' => 'border-blue-200',
-            'bg' => 'bg-blue-50',
-            'text' => 'text-blue-700',
-            'dot' => 'bg-blue-600',
-            'iconBg' => 'bg-blue-50 text-blue-600 border-blue-100',
+            'border' => 'border-blue-200 dark:border-blue-800/60',
+            'bg' => 'bg-blue-50 dark:bg-blue-950/40',
+            'text' => 'text-blue-700 dark:text-blue-400',
+            'dot' => 'bg-blue-600 dark:bg-blue-500',
+            'iconBg' => 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/60',
         ],
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-line p-5 flex flex-col justify-between hover:border-blue-200 transition-colors']) }}>
-    <!-- Header: Label kecil di kiri atas, icon di kotak bersudut bulat berlatar biru muda di kanan atas -->
+<div {{ $attributes->merge(['class' => 'bg-panel rounded-2xl border border-line p-5 flex flex-col justify-between hover:border-accent-mid transition-colors']) }}>
+    <!-- Header: Label kecil di kiri atas, icon di kotak bersudut bulat di kanan atas -->
     <div class="flex items-start justify-between gap-2 mb-2">
         <span class="text-xs font-semibold text-muted uppercase tracking-wider truncate">{{ __($title) }}</span>
         
@@ -97,15 +97,15 @@
     </div>
 
     <!-- Keterangan bahasa awam di bawah & sparkline/slot -->
-    <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-muted">
+    <div class="mt-2 pt-2 border-t border-line flex items-center justify-between text-xs text-muted">
         @if($subtitle)
-            <div class="truncate text-slate-500 font-normal">
+            <div class="truncate text-muted font-normal">
                 {{ __($subtitle) }}
             </div>
         @endif
 
         @if($trend)
-            <div class="inline-flex items-center gap-1 font-mono font-medium shrink-0 ml-auto {{ $trendUp ? 'text-emerald-600' : 'text-rose-600' }}">
+            <div class="inline-flex items-center gap-1 font-mono font-medium shrink-0 ml-auto {{ $trendUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                 <svg class="w-3.5 h-3.5 {{ $trendUp ? '' : 'rotate-180' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                 </svg>

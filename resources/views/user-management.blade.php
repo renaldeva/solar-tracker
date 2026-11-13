@@ -45,9 +45,9 @@
     @endif
 
     <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
-    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+    <div class="mb-6 p-4 rounded-2xl bg-panel border border-line shadow-xs flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
-            <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+            <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-950/50"></div>
             <div>
                 <h2 class="text-sm font-semibold text-ink">
                     Pengendalian Akses Pengguna Terproteksi
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="hidden sm:flex items-center space-x-2">
-            <span class="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <span class="px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                 RBAC ACTIVE
             </span>
         </div>
@@ -100,8 +100,8 @@
     </div>
 
     <!-- Users Table Card (Smart Nursery Style) -->
-    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
-        <div class="p-4 sm:p-5 border-b border-line flex items-center justify-between bg-slate-50/40">
+    <div class="bg-panel border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex items-center justify-between bg-panel-alt/60">
             <div>
                 <h3 class="text-sm font-semibold text-ink">{{ __('Direktori Pengguna Sistem') }}</h3>
                 <p class="text-xs text-muted mt-0.5">{{ __('Pengaturan peran, status aktif, dan kebijakan kata sandi akun.') }}</p>
@@ -111,7 +111,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
+                <thead class="bg-panel-alt text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
                         <th class="py-3 px-4">{{ __('Pengguna') }}</th>
                         <th class="py-3 px-4">{{ __('Alamat Email') }}</th>
@@ -127,9 +127,9 @@
                         @php
                             $roleString = $user->role instanceof \BackedEnum ? $user->role->value : (string) $user->role;
                             $roleBadge = match($roleString) {
-                                'admin' => 'border-amber-200 text-amber-700 bg-amber-50 font-semibold',
-                                'operator' => 'border-blue-200 text-blue-700 bg-blue-50 font-semibold',
-                                default => 'border-line text-muted bg-slate-50 font-semibold',
+                                'admin' => 'border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-semibold',
+                                'operator' => 'border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 font-semibold',
+                                default => 'border-line text-muted bg-panel-alt font-semibold',
                             };
                             $roleDisplay = match($roleString) {
                                 'admin' => __('Admin'),
@@ -138,11 +138,11 @@
                             };
                             $isActive = (bool) ($user->is_active ?? true);
                         @endphp
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        <tr class="hover:bg-panel-alt/50 transition-colors">
                             <td class="py-3 px-4 font-sans text-ink font-semibold">
                                 {{ $user->name }}
                                 @if(auth()->id() === $user->id)
-                                    <span class="ml-1 text-[11px] text-blue-600 font-sans font-bold">({{ __('Anda') }})</span>
+                                    <span class="ml-1 text-[11px] text-blue-600 dark:text-blue-400 font-sans font-bold">({{ __('Anda') }})</span>
                                 @endif
                             </td>
                             <td class="py-3 px-4 text-muted">{{ $user->email }}</td>
@@ -152,14 +152,14 @@
                                 </span>
                             </td>
                             <td class="py-3 px-4">
-                                <span class="inline-flex items-center space-x-1.5 font-semibold {{ $isActive ? 'text-emerald-600' : 'text-rose-600' }}">
+                                <span class="inline-flex items-center space-x-1.5 font-semibold {{ $isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ $isActive ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
                                     <span>{{ $isActive ? __('Aktif') : __('Nonaktif') }}</span>
                                 </span>
                             </td>
                             <td class="py-3 px-4 font-sans">
                                 @if($user->force_password_change)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono border border-amber-200 text-amber-700 bg-amber-50 font-semibold">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-semibold">
                                         {{ __('Wajib ganti kata sandi') }}
                                     </span>
                                 @else
@@ -173,7 +173,7 @@
                                 <button 
                                     type="button" 
                                     onclick="openEditUserModal(@js($user))"
-                                    class="inline-flex items-center px-2.5 py-1 rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 text-xs font-semibold transition-colors shadow-2xs cursor-pointer"
+                                    class="inline-flex items-center px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-xs font-semibold transition-colors shadow-2xs cursor-pointer"
                                 >
                                     {{ __('Edit') }}
                                 </button>
@@ -181,7 +181,7 @@
                                 @if(auth()->id() !== $user->id)
                                     <form method="POST" action="{{ route('user-management.toggle-status', $user) }}" class="inline-block">
                                         @csrf
-                                        <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded-lg border border-line bg-white hover:bg-slate-50 text-ink text-xs font-semibold transition-colors shadow-2xs cursor-pointer">
+                                        <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded-lg border border-line bg-panel hover:bg-panel-alt text-ink text-xs font-semibold transition-colors shadow-2xs cursor-pointer">
                                             {{ $isActive ? __('Nonaktifkan') : __('Aktifkan') }}
                                         </button>
                                     </form>
@@ -189,7 +189,7 @@
                                     <form method="POST" action="{{ route('user-management.destroy', $user) }}" class="inline-block" onsubmit="return confirm('{{ __('Apakah Anda yakin ingin menghapus akun') }} {{ $user->name }}?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded-lg border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
+                                        <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
                                             {{ __('Hapus') }}
                                         </button>
                                     </form>
@@ -203,9 +203,9 @@
     </div>
 
     <!-- Modal: Add User -->
-    <div id="addUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full border border-line overflow-hidden shadow-xl">
-            <div class="px-6 py-4.5 border-b border-line flex items-center justify-between bg-slate-50/50">
+    <div id="addUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-panel rounded-2xl max-w-lg w-full border border-line overflow-hidden shadow-xl">
+            <div class="px-6 py-4.5 border-b border-line flex items-center justify-between bg-panel-alt/60">
                 <div>
                     <h3 class="text-sm font-bold text-ink">{{ __('Tambah Pengguna Baru') }}</h3>
                     <p class="text-xs text-muted mt-0.5">{{ __('Buat kredensial akun dan tetapkan peran akses') }}</p>
@@ -221,19 +221,19 @@
                 @csrf
                 <div>
                     <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Nama Lengkap') }} *</label>
-                    <input type="text" name="name" required class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="text" name="name" required class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
 
                 <div>
                     <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Alamat Email') }} *</label>
-                    <input type="email" name="email" required class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="email" name="email" required class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Peran Sistem') }} *</label>
                         <div class="relative">
-                            <select name="role" required class="appearance-none w-full text-xs bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs font-semibold">
+                            <select name="role" required class="appearance-none w-full text-xs bg-panel border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs font-semibold">
                                 <option value="viewer">{{ __('Pengamat (Hanya-Baca)') }}</option>
                                 <option value="operator">{{ __('Operator (Kontrol Perintah)') }}</option>
                                 <option value="admin">{{ __('Administrator (Penuh)') }}</option>
@@ -247,7 +247,7 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Kata Sandi Sementara') }} *</label>
-                        <input type="password" name="password" required class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                        <input type="password" name="password" required class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                     </div>
                 </div>
 
@@ -259,7 +259,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-line flex items-center justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-line text-muted hover:text-ink text-xs font-medium transition-colors bg-white cursor-pointer">
+                    <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-line text-muted hover:text-ink text-xs font-medium transition-colors bg-panel cursor-pointer">
                         {{ __('Batal') }}
                     </button>
                     <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer">
@@ -271,9 +271,9 @@
     </div>
 
     <!-- Modal: Edit User -->
-    <div id="editUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full border border-line overflow-hidden shadow-xl">
-            <div class="px-6 py-4.5 border-b border-line flex items-center justify-between bg-slate-50/50">
+    <div id="editUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-panel rounded-2xl max-w-lg w-full border border-line overflow-hidden shadow-xl">
+            <div class="px-6 py-4.5 border-b border-line flex items-center justify-between bg-panel-alt/60">
                 <div>
                     <h3 class="text-sm font-bold text-ink">{{ __('Edit Pengguna') }}</h3>
                     <p class="text-xs text-muted mt-0.5">{{ __('Perbarui informasi akun dan peran pengguna') }}</p>
@@ -290,19 +290,19 @@
                 @method('PUT')
                 <div>
                     <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Nama Lengkap') }} *</label>
-                    <input type="text" id="editName" name="name" required class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="text" id="editName" name="name" required class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
 
                 <div>
                     <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Alamat Email') }} *</label>
-                    <input type="email" id="editEmail" name="email" required class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <input type="email" id="editEmail" name="email" required class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Peran Sistem') }} *</label>
                         <div class="relative">
-                            <select id="editRole" name="role" required class="appearance-none w-full text-xs bg-white border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs font-semibold">
+                            <select id="editRole" name="role" required class="appearance-none w-full text-xs bg-panel border border-line rounded-xl pl-3 pr-8 py-2.5 text-ink focus:outline-none focus:border-blue-500 shadow-2xs font-semibold">
                                 <option value="viewer">{{ __('Pengamat (Hanya-Baca)') }}</option>
                                 <option value="operator">{{ __('Operator (Kontrol Perintah)') }}</option>
                                 <option value="admin">{{ __('Administrator (Penuh)') }}</option>
@@ -316,7 +316,7 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-muted uppercase tracking-wider mb-1.5">{{ __('Kata Sandi Baru (Opsional)') }}</label>
-                        <input type="password" name="password" placeholder="{{ __('Biarkan kosong jika tidak diubah') }}" class="w-full text-xs bg-white border border-line rounded-xl px-3.5 py-2.5 text-ink placeholder-muted focus:outline-none focus:border-blue-500 shadow-2xs">
+                        <input type="password" name="password" placeholder="{{ __('Biarkan kosong jika tidak diubah') }}" class="w-full text-xs bg-panel border border-line rounded-xl px-3.5 py-2.5 text-ink placeholder-muted focus:outline-none focus:border-blue-500 shadow-2xs">
                     </div>
                 </div>
 
@@ -328,7 +328,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-line flex items-center justify-end space-x-2">
-                    <button type="button" onclick="document.getElementById('editUserModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-line text-muted hover:text-ink text-xs font-medium transition-colors bg-white cursor-pointer">
+                    <button type="button" onclick="document.getElementById('editUserModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-line text-muted hover:text-ink text-xs font-medium transition-colors bg-panel cursor-pointer">
                         {{ __('Batal') }}
                     </button>
                     <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer">

@@ -473,6 +473,13 @@
                     if (!ctx) return;
 
                     const powerLabel = window.__ ? window.__('Daya (W)') : 'Daya (W)';
+                    const themeColors = window.getChartThemeColors ? window.getChartThemeColors() : {
+                        primary: '#2563eb',
+                        primaryFill: 'rgba(37, 99, 235, 0.08)',
+                        grid: 'rgba(226, 232, 240, 0.7)',
+                        text: '#64748b',
+                        isDark: false
+                    };
 
                     this.liveChart = new Chart(ctx, {
                         type: 'line',
@@ -481,15 +488,15 @@
                             datasets: [{
                                 label: powerLabel,
                                 data: this.metrics.chart_24h.values,
-                                borderColor: '#2563eb',
+                                borderColor: themeColors.primary,
                                 borderWidth: 2.5,
-                                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                backgroundColor: themeColors.primaryFill,
                                 fill: true,
                                 tension: 0.35,
                                 pointRadius: 0,
                                 pointHoverRadius: 5,
-                                pointBackgroundColor: '#2563eb',
-                                pointBorderColor: '#ffffff',
+                                pointBackgroundColor: themeColors.primary,
+                                pointBorderColor: themeColors.isDark ? '#111a2e' : '#ffffff',
                                 pointBorderWidth: 2,
                             }]
                         },
@@ -506,19 +513,20 @@
                             },
                             scales: {
                                 x: {
-                                    grid: { color: 'rgba(226, 232, 240, 0.7)' },
-                                    ticks: { maxTicksLimit: 12 }
+                                    grid: { color: themeColors.grid },
+                                    ticks: { color: themeColors.text, maxTicksLimit: 12 }
                                 },
                                 y: {
                                     beginAtZero: true,
-                                    grid: { color: 'rgba(226, 232, 240, 0.7)' },
+                                    grid: { color: themeColors.grid },
                                     ticks: {
+                                        color: themeColors.text,
                                         callback: (value) => window.formatNumberId ? window.formatNumberId(value, 0) : value
                                     },
                                     title: {
                                         display: true,
                                         text: 'Daya (W)',
-                                        color: '#64748b',
+                                        color: themeColors.text,
                                         font: {
                                             family: "'Inter', sans-serif",
                                             size: 11,
@@ -537,6 +545,12 @@
 
                     const todayLabel = window.__ ? window.__('Hari Ini (kWh)') : 'Hari Ini (kWh)';
                     const yesterdayLabel = window.__ ? window.__('Kemarin (kWh)') : 'Kemarin (kWh)';
+                    const themeColors = window.getChartThemeColors ? window.getChartThemeColors() : {
+                        barNew: '#2563eb',
+                        barOld: '#dbeafe',
+                        grid: 'rgba(226, 232, 240, 0.7)',
+                        text: '#64748b'
+                    };
 
                     this.compareChart = new Chart(ctx, {
                         type: 'bar',
@@ -546,14 +560,14 @@
                                 {
                                     label: todayLabel,
                                     data: this.metrics.chart_compare.today,
-                                    backgroundColor: '#2563eb',
+                                    backgroundColor: themeColors.barNew,
                                     borderRadius: 6,
                                     barPercentage: 0.6,
                                 },
                                 {
                                     label: yesterdayLabel,
                                     data: this.metrics.chart_compare.yesterday,
-                                    backgroundColor: '#93c5fd',
+                                    backgroundColor: themeColors.barOld,
                                     borderRadius: 6,
                                     barPercentage: 0.6,
                                 }
@@ -573,18 +587,19 @@
                             scales: {
                                 x: {
                                     grid: { display: false },
-                                    ticks: { maxTicksLimit: 12 }
+                                    ticks: { color: themeColors.text, maxTicksLimit: 12 }
                                 },
                                 y: {
                                     beginAtZero: true,
-                                    grid: { color: 'rgba(226, 232, 240, 0.7)' },
+                                    grid: { color: themeColors.grid },
                                     ticks: {
+                                        color: themeColors.text,
                                         callback: (value) => window.formatNumberId ? window.formatNumberId(value, 1) : value
                                     },
                                     title: {
                                         display: true,
                                         text: 'Energi (kWh)',
-                                        color: '#64748b',
+                                        color: themeColors.text,
                                         font: {
                                             family: "'Inter', sans-serif",
                                             size: 11,

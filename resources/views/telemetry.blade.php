@@ -84,14 +84,14 @@
                 </div>
 
                 <!-- Range Buttons (Pill Buttons) -->
-                <div class="flex flex-wrap items-center gap-1.5 p-1 bg-slate-50 border border-line rounded-xl">
+                <div class="flex flex-wrap items-center gap-1.5 p-1 bg-panel-alt border border-line rounded-xl">
                     @foreach(['1h' => '1 Jam', '6h' => '6 Jam', '24h' => '24 Jam', '7d' => '7 Hari'] as $val => $label)
                         <button 
                             type="submit" 
                             name="range" 
                             value="{{ $val }}" 
                             @click="rangeMode = '{{ $val }}'"
-                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $selectedRange === $val ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-white' }}"
+                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $selectedRange === $val ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-panel' }}"
                         >
                             {{ $label }}
                         </button>
@@ -99,7 +99,7 @@
                     <button 
                         type="button" 
                         @click="rangeMode = 'custom'" 
-                        :class="rangeMode === 'custom' ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-white'"
+                        :class="rangeMode === 'custom' ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-panel'"
                         class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
                     >
                         Kustom
@@ -143,45 +143,45 @@
                     $availableMetrics = [
                         'power' => [
                             'label' => __('Daya (W)'), 
-                            'active_class' => 'text-blue-700 bg-blue-50 border-blue-200 ring-1 ring-blue-200 font-semibold',
-                            'dot' => 'bg-blue-600'
+                            'active_class' => 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/40 dark:border-blue-800/60 ring-1 ring-blue-200 dark:ring-blue-800/60 font-semibold',
+                            'dot' => 'bg-blue-600 dark:bg-blue-500'
                         ],
                         'voltage' => [
                             'label' => __('Tegangan (V)'), 
-                            'active_class' => 'text-amber-700 bg-amber-50 border-amber-200 ring-1 ring-amber-200 font-semibold',
+                            'active_class' => 'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/40 dark:border-amber-800/60 ring-1 ring-amber-200 dark:ring-amber-800/60 font-semibold',
                             'dot' => 'bg-amber-500'
                         ],
                         'current' => [
                             'label' => __('Arus (A)'), 
-                            'active_class' => 'text-emerald-700 bg-emerald-50 border-emerald-200 ring-1 ring-emerald-200 font-semibold',
+                            'active_class' => 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-800/60 ring-1 ring-emerald-200 dark:ring-emerald-800/60 font-semibold',
                             'dot' => 'bg-emerald-500'
                         ],
                         'wind_speed' => [
                             'label' => __('Kecepatan Angin (m/s)'), 
-                            'active_class' => 'text-rose-700 bg-rose-50 border-rose-200 ring-1 ring-rose-200 font-semibold',
+                            'active_class' => 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800/60 ring-1 ring-rose-200 dark:ring-rose-800/60 font-semibold',
                             'dot' => 'bg-rose-500'
                         ],
                         'pitch_elev' => [
                             'label' => __('Elevasi (°)'), 
-                            'active_class' => 'text-purple-700 bg-purple-50 border-purple-200 ring-1 ring-purple-200 font-semibold',
-                            'dot' => 'bg-purple-600'
+                            'active_class' => 'text-purple-700 bg-purple-50 border-purple-200 dark:text-purple-400 dark:bg-purple-950/40 dark:border-purple-800/60 ring-1 ring-purple-200 dark:ring-purple-800/60 font-semibold',
+                            'dot' => 'bg-purple-600 dark:bg-purple-500'
                         ],
                         'azimuth' => [
                             'label' => __('Azimut (°)'), 
-                            'active_class' => 'text-cyan-700 bg-cyan-50 border-cyan-200 ring-1 ring-cyan-200 font-semibold',
-                            'dot' => 'bg-cyan-600'
+                            'active_class' => 'text-cyan-700 bg-cyan-50 border-cyan-200 dark:text-cyan-400 dark:bg-cyan-950/40 dark:border-cyan-800/60 ring-1 ring-cyan-200 dark:ring-cyan-800/60 font-semibold',
+                            'dot' => 'bg-cyan-600 dark:bg-cyan-500'
                         ],
                         'temp_c' => [
                             'label' => __('Suhu Panel (°C)'), 
-                            'active_class' => 'text-pink-700 bg-pink-50 border-pink-200 ring-1 ring-pink-200 font-semibold',
-                            'dot' => 'bg-pink-600'
+                            'active_class' => 'text-pink-700 bg-pink-50 border-pink-200 dark:text-pink-400 dark:bg-pink-950/40 dark:border-pink-800/60 ring-1 ring-pink-200 dark:ring-pink-800/60 font-semibold',
+                            'dot' => 'bg-pink-600 dark:bg-pink-500'
                         ],
                     ];
                 @endphp
 
                 @foreach($availableMetrics as $key => $meta)
                     @php $checked = in_array($key, $selectedMetrics, true); @endphp
-                    <label class="cursor-pointer inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all shadow-2xs {{ $checked ? $meta['active_class'] : 'bg-white text-muted border-line opacity-60 hover:opacity-100 hover:border-slate-300' }}">
+                    <label class="cursor-pointer inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all shadow-2xs {{ $checked ? $meta['active_class'] : 'bg-panel text-muted border-line opacity-60 hover:opacity-100 hover:border-slate-300 dark:hover:border-slate-700' }}">
                         <input 
                             type="checkbox" 
                             name="metrics[]" 
@@ -223,8 +223,8 @@
     </div>
 
     <!-- High-Density Telemetry Table Card -->
-    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
-        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/40">
+    <div class="bg-panel border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-panel-alt/60">
             <div>
                 <h3 class="text-sm font-semibold text-ink">{{ __('Paket Sensor Terekam') }}</h3>
                 <p class="text-xs text-muted mt-0.5">{{ __('Waktu ditampilkan dalam UTC+7 (WIB)') }}</p>
@@ -240,7 +240,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
+                <thead class="bg-panel-alt text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
                         <th class="py-3 px-3.5">{{ __('Waktu (WIB)') }}</th>
                         <th class="py-3 px-3.5">{{ __('Mode') }}</th>
@@ -258,21 +258,21 @@
                 </thead>
                 <tbody class="divide-y divide-line font-mono text-xs">
                     @forelse($telemetries as $tel)
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        <tr class="hover:bg-panel-alt/50 transition-colors">
                             <td class="py-3 px-3.5 font-mono text-ink whitespace-nowrap">
                                 {{ $tel->recorded_at ? $tel->recorded_at->setTimezone('Asia/Jakarta')->format('d M H:i:s') . ' WIB' : '--' }}
                             </td>
                             <td class="py-3 px-3.5">
                                 <span class="px-2 py-0.5 rounded-md text-[11px] font-mono uppercase border border-line
-                                    {{ $tel->mode === 'auto' ? 'bg-blue-50 text-blue-700 border-blue-200' : ($tel->mode === 'stow' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-50 text-muted') }}">
+                                    {{ $tel->mode === 'auto' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/60' : ($tel->mode === 'stow' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/60' : 'bg-slate-50 dark:bg-slate-800 text-muted') }}">
                                     {{ match(strtolower($tel->mode)) { 'auto' => __('Otomatis'), 'manual' => __('Manual'), 'stow' => __('Stow'), default => strtoupper($tel->mode) } }}
                                 </span>
                             </td>
                             <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->voltage, 1) }} V</td>
                             <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->current, 2) }} A</td>
-                            <td class="py-3 px-3.5 font-bold text-blue-600">{{ formatPowerW($tel->power) }}</td>
+                            <td class="py-3 px-3.5 font-bold text-blue-600 dark:text-blue-400">{{ formatPowerW($tel->power) }}</td>
                             <td class="py-3 px-3.5 text-muted">{{ formatNumberId($tel->energy_wh, 0) }} Wh</td>
-                            <td class="py-3 px-3.5 {{ $tel->wind_speed >= 15.0 ? 'text-rose-600 font-bold' : 'text-ink' }}">
+                            <td class="py-3 px-3.5 {{ $tel->wind_speed >= 15.0 ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-ink' }}">
                                 {{ formatNumberId($tel->wind_speed, 1) }} m/s
                             </td>
                             <td class="py-3 px-3.5 text-ink">
@@ -285,12 +285,12 @@
                             </td>
                             <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->temp_c, 1) }}&deg;C</td>
                             <td class="py-3 px-3.5">
-                                <span class="text-[11px] {{ $tel->fix ? 'text-emerald-600 font-semibold' : 'text-amber-600' }}">
+                                <span class="text-[11px] {{ $tel->fix ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-amber-600 dark:text-amber-400' }}">
                                     {{ $tel->fix ? '3D (' . $tel->satellites . 's)' : 'No Fix' }}
                                 </span>
                             </td>
                             <td class="py-3 px-3.5">
-                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono border {{ $tel->cal_sys >= 2 ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-amber-200 text-amber-700 bg-amber-50' }}">
+                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono border {{ $tel->cal_sys >= 2 ? 'border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40' : 'border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40' }}">
                                     Sys:{{ $tel->cal_sys ?? 0 }}
                                 </span>
                             </td>
@@ -307,7 +307,7 @@
         </div>
 
         @if($telemetries->hasPages())
-            <div class="p-4 border-t border-line bg-slate-50/40">
+            <div class="p-4 border-t border-line bg-panel-alt/60">
                 {{ $telemetries->links() }}
             </div>
         @endif
@@ -384,6 +384,13 @@
                     const ctx = document.getElementById('telemetryChartCanvas');
                     if (!ctx) return;
 
+                    const theme = window.getChartThemeColors ? window.getChartThemeColors() : {
+                        text: '#64748b',
+                        grid: '#f1f5f9',
+                        tooltipBg: '#0f172a',
+                        tooltipBorder: '#334155'
+                    };
+
                     const numberFmt = new Intl.NumberFormat('id-ID');
                     const datasets = this.chartData.datasets || [];
                     this.configureMultiAxis(datasets);
@@ -411,15 +418,15 @@
                                         boxWidth: 12,
                                         boxHeight: 12,
                                         font: { size: 12, family: 'Inter' },
-                                        color: '#64748b',
+                                        color: theme.text,
                                         padding: 14
                                     }
                                 },
                                 tooltip: {
-                                    backgroundColor: '#0f172a',
+                                    backgroundColor: theme.tooltipBg,
                                     titleColor: '#ffffff',
                                     bodyColor: '#ffffff',
-                                    borderColor: '#e2e8f0',
+                                    borderColor: theme.tooltipBorder,
                                     borderWidth: 1,
                                     padding: 10,
                                     titleFont: { size: 12, family: 'Inter' },
@@ -436,10 +443,10 @@
                             },
                             scales: {
                                 x: {
-                                    grid: { color: '#f1f5f9', drawTicks: false },
+                                    grid: { color: theme.grid, drawTicks: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#64748b',
+                                        color: theme.text,
                                         maxTicksLimit: 12
                                     }
                                 },
@@ -447,10 +454,10 @@
                                     type: 'linear',
                                     display: true,
                                     position: 'left',
-                                    grid: { color: '#f1f5f9', drawTicks: false },
+                                    grid: { color: theme.grid, drawTicks: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#64748b',
+                                        color: theme.text,
                                         callback: function(value) {
                                             return numberFmt.format(value);
                                         }
@@ -463,7 +470,7 @@
                                     grid: { drawOnChartArea: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#64748b',
+                                        color: theme.text,
                                         callback: function(value) {
                                             return numberFmt.format(value);
                                         }

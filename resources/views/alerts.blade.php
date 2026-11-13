@@ -100,7 +100,7 @@
     </div>
 
     {{-- Filter Card --}}
-    <div class="bg-white border border-line rounded-2xl p-4 sm:p-5 mb-6 shadow-xs">
+    <div class="bg-panel border border-line rounded-2xl p-4 sm:p-5 mb-6 shadow-xs">
         <form method="GET" action="{{ route('alerts') }}" class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {{-- Status Tabs --}}
             <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
@@ -108,23 +108,23 @@
                     $curStatus = $filters['status'] ?? 'all';
                 @endphp
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'all' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}">
+                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'all' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}">
                     {{ __('Semua') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'active'])) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'active' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}">
+                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'active' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}">
                     {{ __('Aktif') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'open'])) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'open' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}">
+                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'open' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}">
                     {{ __('Terbuka') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'acknowledged'])) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'acknowledged' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}">
+                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'acknowledged' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}">
                     {{ __('Diakui') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'resolved'])) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'resolved' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}">
+                   class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $curStatus === 'resolved' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}">
                     {{ __('Selesai') }}
                 </a>
             </div>
@@ -135,7 +135,7 @@
 
                 {{-- Severity Filter --}}
                 <div class="relative">
-                    <select name="severity" onchange="this.form.submit()" class="appearance-none h-10 pl-3 pr-8 py-1.5 bg-white border border-line rounded-xl text-ink text-xs font-semibold focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <select name="severity" onchange="this.form.submit()" class="appearance-none h-10 pl-3 pr-8 py-1.5 bg-panel border border-line rounded-xl text-ink text-xs font-semibold focus:outline-none focus:border-blue-500 shadow-2xs">
                         <option value="all" {{ ($filters['severity'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('Semua Tingkat') }}</option>
                         <option value="critical" {{ ($filters['severity'] ?? '') === 'critical' ? 'selected' : '' }}>{{ __('Hanya Kritis') }}</option>
                         <option value="warning" {{ ($filters['severity'] ?? '') === 'warning' ? 'selected' : '' }}>{{ __('Hanya Peringatan') }}</option>
@@ -150,7 +150,7 @@
 
                 {{-- Device Filter --}}
                 <div class="relative">
-                    <select name="device_id" onchange="this.form.submit()" class="appearance-none h-10 pl-3 pr-8 py-1.5 bg-white border border-line rounded-xl text-ink text-xs font-semibold focus:outline-none focus:border-blue-500 shadow-2xs">
+                    <select name="device_id" onchange="this.form.submit()" class="appearance-none h-10 pl-3 pr-8 py-1.5 bg-panel border border-line rounded-xl text-ink text-xs font-semibold focus:outline-none focus:border-blue-500 shadow-2xs">
                         <option value="all" {{ ($filters['device_id'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('Semua Node Tracker') }}</option>
                         @foreach($devices as $dev)
                             <option value="{{ $dev->id }}" {{ (string)($filters['device_id'] ?? '') === (string)$dev->id ? 'selected' : '' }}>
@@ -168,7 +168,7 @@
                 {{-- Text Search --}}
                 <div class="relative">
                     <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Cari kode, pesan...') }}" 
-                           class="w-48 sm:w-56 h-10 pl-9 pr-3 py-1.5 bg-white border border-line rounded-xl text-ink placeholder-muted focus:outline-none focus:border-blue-500 text-xs shadow-2xs">
+                           class="w-48 sm:w-56 h-10 pl-9 pr-3 py-1.5 bg-panel border border-line rounded-xl text-ink placeholder-muted focus:outline-none focus:border-blue-500 text-xs shadow-2xs">
                     <svg class="w-4 h-4 text-muted absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -179,7 +179,7 @@
                 </button>
 
                 @if(!empty($filters['q']) || ($filters['severity'] ?? 'all') !== 'all' || ($filters['device_id'] ?? 'all') !== 'all' || ($filters['status'] ?? 'all') !== 'all')
-                    <a href="{{ route('alerts') }}" class="h-10 px-3 py-1.5 border border-line text-muted hover:text-ink text-xs font-medium rounded-xl transition-colors flex items-center bg-white">
+                    <a href="{{ route('alerts') }}" class="h-10 px-3 py-1.5 border border-line text-muted hover:text-ink text-xs font-medium rounded-xl transition-colors flex items-center bg-panel">
                         {{ __('Reset') }}
                     </a>
                 @endif
@@ -188,8 +188,8 @@
     </div>
 
     {{-- Alerts Table Card --}}
-    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
-        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/40">
+    <div class="bg-panel border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-panel-alt/60">
             <div>
                 <h3 class="text-sm font-semibold text-ink">{{ __('Log Peringatan Sistem') }}</h3>
                 <p class="text-xs text-muted mt-0.5">{{ __('Riwayat lengkap SCADA interlock, kendala perangkat keras, dan transisi kondisi.') }}</p>
@@ -205,7 +205,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
+                <thead class="bg-panel-alt text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
                         <th class="py-3 px-4">{{ __('Tingkat') }}</th>
                         <th class="py-3 px-4">{{ __('Kode & Pesan') }}</th>
@@ -217,21 +217,21 @@
                 </thead>
                 <tbody class="divide-y divide-line" id="alertsTableBody">
                     @forelse($alerts as $alert)
-                        <tr class="hover:bg-slate-50/50 transition-colors" id="alert-row-{{ $alert->id }}">
+                        <tr class="hover:bg-panel-alt/50 transition-colors" id="alert-row-{{ $alert->id }}">
                             {{-- Severity Badge (dot + text) --}}
                             <td class="py-3.5 px-4 align-top whitespace-nowrap">
                                 @if($alert->severity === 'critical')
-                                    <span class="inline-flex items-center space-x-1.5 text-rose-600 font-mono text-xs font-semibold">
+                                    <span class="inline-flex items-center space-x-1.5 text-rose-600 dark:text-rose-400 font-mono text-xs font-semibold">
                                         <span class="w-2 h-2 rounded-full bg-rose-500 {{ $alert->status === 'open' ? 'animate-pulse' : '' }}"></span>
                                         <span>KRITIS</span>
                                     </span>
                                 @elseif($alert->severity === 'warning')
-                                    <span class="inline-flex items-center space-x-1.5 text-amber-600 font-mono text-xs font-semibold">
+                                    <span class="inline-flex items-center space-x-1.5 text-amber-600 dark:text-amber-400 font-mono text-xs font-semibold">
                                         <span class="w-2 h-2 rounded-full bg-amber-500"></span>
                                         <span>PERINGATAN</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center space-x-1.5 text-blue-600 font-mono text-xs font-semibold">
+                                    <span class="inline-flex items-center space-x-1.5 text-blue-600 dark:text-blue-400 font-mono text-xs font-semibold">
                                         <span class="w-2 h-2 rounded-full bg-blue-500"></span>
                                         <span>INFO</span>
                                     </span>
@@ -241,7 +241,7 @@
                             {{-- Code & Message --}}
                             <td class="py-3.5 px-4 align-top">
                                 <div class="flex items-center space-x-2">
-                                    <span class="font-mono text-xs text-ink px-2 py-0.5 rounded-md border border-line bg-slate-100 font-semibold">
+                                    <span class="font-mono text-xs text-ink px-2 py-0.5 rounded-md border border-line bg-panel-alt font-semibold">
                                         {{ $alert->code }}
                                     </span>
                                 </div>
@@ -252,7 +252,7 @@
                                     <div class="flex flex-wrap gap-1 mt-1.5">
                                         @foreach($alert->metadata as $mKey => $mVal)
                                             @if(is_scalar($mVal))
-                                                <span class="inline-flex items-center text-[11px] bg-slate-50 text-muted border border-line px-2 py-0.5 rounded-md font-mono">
+                                                <span class="inline-flex items-center text-[11px] bg-panel-alt text-muted border border-line px-2 py-0.5 rounded-md font-mono">
                                                     {{ $mKey }}: {{ is_bool($mVal) ? ($mVal ? 'true' : 'false') : $mVal }}
                                                 </span>
                                             @endif
@@ -264,7 +264,7 @@
                             {{-- Device & Site --}}
                             <td class="py-3.5 px-4 align-top whitespace-nowrap">
                                 <div class="font-semibold text-ink">
-                                    <a href="{{ route('solar-tracker', ['uid' => $alert->device?->uid]) }}" class="hover:text-blue-600 transition-colors">
+                                    <a href="{{ route('solar-tracker', ['uid' => $alert->device?->uid]) }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                         {{ $alert->device?->uid ?? 'N/A' }}
                                     </a>
                                 </div>
@@ -286,13 +286,13 @@
                             {{-- Status Cell --}}
                             <td class="py-3.5 px-4 align-top whitespace-nowrap" id="status-cell-{{ $alert->id }}">
                                 @if($alert->status === 'open')
-                                    <span class="inline-flex items-center space-x-1.5 text-rose-600 font-mono text-xs font-semibold">
+                                    <span class="inline-flex items-center space-x-1.5 text-rose-600 dark:text-rose-400 font-mono text-xs font-semibold">
                                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                         <span>Terbuka</span>
                                     </span>
                                 @elseif($alert->status === 'acknowledged')
                                     <div>
-                                        <span class="inline-flex items-center space-x-1.5 text-purple-600 font-mono text-xs font-semibold">
+                                        <span class="inline-flex items-center space-x-1.5 text-purple-600 dark:text-purple-400 font-mono text-xs font-semibold">
                                             <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                             <span>Diakui</span>
                                         </span>
@@ -302,7 +302,7 @@
                                     </div>
                                 @else
                                     <div>
-                                        <span class="inline-flex items-center space-x-1.5 text-emerald-600 font-mono text-xs font-semibold">
+                                        <span class="inline-flex items-center space-x-1.5 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             <span>Selesai</span>
                                         </span>
@@ -320,7 +320,7 @@
                                         @if($alert->status === 'open')
                                             <button type="button" 
                                                     onclick="handleAlertAction('acknowledge', {{ $alert->id }})"
-                                                    class="h-8 px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
+                                                    class="h-8 px-3 py-1 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
                                                 {{ __('Acknowledge') }}
                                             </button>
                                         @endif
@@ -328,7 +328,7 @@
                                         @if($alert->status !== 'resolved')
                                             <button type="button" 
                                                     onclick="handleAlertAction('resolve', {{ $alert->id }})"
-                                                    class="h-8 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
+                                                    class="h-8 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-2xs">
                                                 {{ __('Resolve') }}
                                             </button>
                                         @else
@@ -348,8 +348,8 @@
                     @empty
                         <tr>
                             <td colspan="6" class="p-8 text-center text-muted">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-100 text-muted mx-auto flex items-center justify-center mb-3">
-                                    <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="w-12 h-12 rounded-2xl bg-panel-alt text-muted mx-auto flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
@@ -365,7 +365,7 @@
         </div>
 
         @if($alerts->hasPages())
-            <div class="p-4 border-t border-line bg-slate-50/40">
+            <div class="p-4 border-t border-line bg-panel-alt/60">
                 {{ $alerts->links() }}
             </div>
         @endif

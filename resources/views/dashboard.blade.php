@@ -207,7 +207,7 @@
                         <path 
                             d="M 15 80 A 65 65 0 0 1 145 80" 
                             fill="none" 
-                            stroke="#e2e8f0" 
+                            stroke="var(--gauge-bg)" 
                             stroke-width="12" 
                             stroke-linecap="round"
                         />
@@ -215,7 +215,7 @@
                         <path 
                             d="M 15 80 A 65 65 0 0 1 145 80" 
                             fill="none" 
-                            stroke="#2563eb" 
+                            stroke="var(--gauge-fill)" 
                             stroke-width="12" 
                             stroke-linecap="round"
                             stroke-dasharray="204.2"
@@ -530,6 +530,14 @@
                         ? (window.__ ? window.__('Daya (W)') : 'Daya (W)') 
                         : (window.__ ? window.__('Produksi per Jam') : 'Produksi per Jam');
 
+                    const themeColors = window.getChartThemeColors ? window.getChartThemeColors() : {
+                        primary: '#2563eb',
+                        primaryFill: 'rgba(37, 99, 235, 0.08)',
+                        grid: 'rgba(226, 232, 240, 0.7)',
+                        text: '#64748b',
+                        isDark: false
+                    };
+
                     this.chart = new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -537,15 +545,15 @@
                             datasets: [{
                                 label: initialLabel,
                                 data: dataset.values,
-                                borderColor: '#2563eb',
+                                borderColor: themeColors.primary,
                                 borderWidth: 2.5,
-                                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                backgroundColor: themeColors.primaryFill,
                                 fill: true,
                                 tension: 0.35,
                                 pointRadius: 0,
                                 pointHoverRadius: 5,
-                                pointBackgroundColor: '#2563eb',
-                                pointBorderColor: '#ffffff',
+                                pointBackgroundColor: themeColors.primary,
+                                pointBorderColor: themeColors.isDark ? '#111a2e' : '#ffffff',
                                 pointBorderWidth: 2,
                             }]
                         },
@@ -571,18 +579,20 @@
                             scales: {
                                 x: {
                                     grid: {
-                                        color: 'rgba(226, 232, 240, 0.7)',
+                                        color: themeColors.grid,
                                     },
                                     ticks: {
+                                        color: themeColors.text,
                                         maxTicksLimit: 12
                                     }
                                 },
                                 y: {
                                     beginAtZero: true,
                                     grid: {
-                                        color: 'rgba(226, 232, 240, 0.7)',
+                                        color: themeColors.grid,
                                     },
                                     ticks: {
+                                        color: themeColors.text,
                                         callback: (value) => {
                                             return window.formatNumberId ? window.formatNumberId(value, 0) : value;
                                         }
@@ -590,7 +600,7 @@
                                     title: {
                                         display: true,
                                         text: this.activeView === 'day' ? 'Daya (W)' : dataset.unit,
-                                        color: '#64748b',
+                                        color: themeColors.text,
                                         font: {
                                             family: "'Inter', sans-serif",
                                             size: 11,

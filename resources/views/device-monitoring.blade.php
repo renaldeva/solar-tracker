@@ -32,9 +32,9 @@
     </x-page-header>
 
     <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
-    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+    <div class="mb-6 p-4 rounded-2xl bg-panel border border-line shadow-xs flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
-            <div class="w-3.5 h-3.5 rounded-full {{ $brokerSocketOk && $offlineCount === 0 ? 'bg-emerald-500 ring-4 ring-emerald-50' : ($brokerSocketOk ? 'bg-amber-500 ring-4 ring-amber-50' : 'bg-rose-500 ring-4 ring-rose-50') }}"></div>
+            <div class="w-3.5 h-3.5 rounded-full {{ $brokerSocketOk && $offlineCount === 0 ? 'bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-950/50' : ($brokerSocketOk ? 'bg-amber-500 ring-4 ring-amber-50 dark:ring-amber-950/50' : 'bg-rose-500 ring-4 ring-rose-50 dark:ring-rose-950/50') }}"></div>
             <div>
                 <h2 class="text-sm font-semibold text-ink">
                     @if($brokerSocketOk && $offlineCount === 0)
@@ -57,10 +57,10 @@
             </div>
         </div>
         <div class="hidden sm:flex items-center space-x-3 text-xs font-mono">
-            <span class="px-2.5 py-1 rounded-lg {{ $brokerSocketOk ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200' : 'bg-rose-50 text-rose-700 font-semibold border border-rose-200' }}">
+            <span class="px-2.5 py-1 rounded-lg {{ $brokerSocketOk ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800/60' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-semibold border border-rose-200 dark:border-rose-800/60' }}">
                 Broker {{ $brokerSocketOk ? 'ONLINE' : 'OFFLINE' }}
             </span>
-            <span class="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-line">
+            <span class="px-2.5 py-1 rounded-lg bg-panel-alt text-ink border border-line">
                 Latensi {{ $connectionLatencyMs !== null ? formatNumberId($connectionLatencyMs, 1) . ' ms' : '< 1 ms' }}
             </span>
         </div>
@@ -116,37 +116,37 @@
             </button>
         </div>
 
-        <div x-show="showDetails" x-cloak class="p-4 rounded-2xl bg-white border border-line shadow-xs">
+        <div x-show="showDetails" x-cloak class="p-4 rounded-2xl bg-panel border border-line shadow-xs">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                <div class="p-3.5 rounded-xl border border-line bg-slate-50/50">
+                <div class="p-3.5 rounded-xl border border-line bg-panel-alt/60">
                     <div class="text-muted font-medium mb-1">Mosquitto Message Broker</div>
                     <div class="font-mono text-ink font-semibold flex items-center justify-between">
                         <span>{{ $brokerHost }}:{{ $brokerPort }}</span>
                         @if($brokerSocketOk)
-                            <span class="text-emerald-600 font-bold">OK</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-bold">OK</span>
                         @else
-                            <span class="text-rose-600 font-bold">FAIL</span>
+                            <span class="text-rose-600 dark:text-rose-400 font-bold">FAIL</span>
                         @endif
                     </div>
                     <div class="text-muted text-[11px] mt-1">Port: 1883 TCP &middot; QoS 1</div>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-line bg-slate-50/50">
+                <div class="p-3.5 rounded-xl border border-line bg-panel-alt/60">
                     <div class="text-muted font-medium mb-1">Layanan Listener Telemetri</div>
                     <div class="font-mono text-ink font-semibold flex items-center justify-between">
                         <span class="truncate">solar_tracker_mqtt_listener</span>
-                        <span class="text-emerald-600 font-bold ml-1">{{ $listenerStatus }}</span>
+                        <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1">{{ $listenerStatus }}</span>
                     </div>
                     <div class="text-muted text-[11px] mt-1 truncate">tracker/+/telemetry</div>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-line bg-slate-50/50">
+                <div class="p-3.5 rounded-xl border border-line bg-panel-alt/60">
                     <div class="text-muted font-medium mb-1">Protokol Komunikasi</div>
                     <div class="font-mono text-ink font-semibold">MQTT v3.1.1 JSON</div>
                     <div class="text-muted text-[11px] mt-1">telemetry, status, ack</div>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-line bg-slate-50/50">
+                <div class="p-3.5 rounded-xl border border-line bg-panel-alt/60">
                     <div class="text-muted font-medium mb-1">Penyimpanan Time-Series</div>
                     <div class="font-mono text-ink font-semibold">Database Time-Series</div>
                     <div class="text-muted text-[11px] mt-1">Rollup per jam &middot; Retensi 7 hari</div>
@@ -156,37 +156,37 @@
     </div>
 
     <!-- Main Device Card (Table + Search + Filters) -->
-    <div class="bg-white border border-line rounded-2xl mb-6 overflow-hidden shadow-xs">
-        <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line bg-slate-50/40">
+    <div class="bg-panel border border-line rounded-2xl mb-6 overflow-hidden shadow-xs">
+        <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line bg-panel-alt/60">
             <!-- Status Tabs -->
             <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
                 <a 
                     href="{{ route('device-monitoring', ['status' => 'all', 'search' => $search]) }}" 
-                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'all' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}"
+                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'all' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}"
                 >
                     <span>Semua Node</span>
-                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'all' ? 'bg-white/20 text-white' : 'bg-slate-100 text-muted' }}">{{ $totalTrackers }}</span>
+                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'all' ? 'bg-white/20 text-white' : 'bg-panel-alt text-muted' }}">{{ $totalTrackers }}</span>
                 </a>
                 <a 
                     href="{{ route('device-monitoring', ['status' => 'online', 'search' => $search]) }}" 
-                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'online' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}"
+                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'online' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}"
                 >
                     <span>Online</span>
-                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'online' ? 'bg-white/20 text-white' : 'bg-slate-100 text-muted' }}">{{ $onlineCount }}</span>
+                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'online' ? 'bg-white/20 text-white' : 'bg-panel-alt text-muted' }}">{{ $onlineCount }}</span>
                 </a>
                 <a 
                     href="{{ route('device-monitoring', ['status' => 'unstable', 'search' => $search]) }}" 
-                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'unstable' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}"
+                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'unstable' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}"
                 >
                     <span>Tidak Stabil</span>
-                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'unstable' ? 'bg-white/20 text-white' : 'bg-slate-100 text-muted' }}">{{ $unstableCount }}</span>
+                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'unstable' ? 'bg-white/20 text-white' : 'bg-panel-alt text-muted' }}">{{ $unstableCount }}</span>
                 </a>
                 <a 
                     href="{{ route('device-monitoring', ['status' => 'offline', 'search' => $search]) }}" 
-                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'offline' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-muted hover:text-ink border border-line' }}"
+                    class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold transition-all {{ $statusFilter === 'offline' ? 'bg-blue-600 text-white shadow-sm' : 'bg-panel text-muted hover:text-ink border border-line' }}"
                 >
                     <span>Offline</span>
-                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'offline' ? 'bg-white/20 text-white' : 'bg-slate-100 text-muted' }}">{{ $offlineCount }}</span>
+                    <span class="ml-2 px-1.5 py-0.5 rounded-md font-mono text-[11px] {{ $statusFilter === 'offline' ? 'bg-white/20 text-white' : 'bg-panel-alt text-muted' }}">{{ $offlineCount }}</span>
                 </a>
             </div>
 
@@ -199,14 +199,14 @@
                         name="search" 
                         value="{{ $search }}" 
                         placeholder="Cari UID atau nama..." 
-                        class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-line rounded-xl text-ink placeholder-muted focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        class="w-full pl-9 pr-3 py-2 text-xs bg-panel border border-line rounded-xl text-ink placeholder-muted focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40"
                     >
                     <svg class="w-4 h-4 text-muted absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
                 @if($search)
-                    <a href="{{ route('device-monitoring', ['status' => $statusFilter]) }}" class="px-3 py-2 text-xs rounded-xl border border-line text-muted hover:text-ink transition-colors bg-white">
+                    <a href="{{ route('device-monitoring', ['status' => $statusFilter]) }}" class="px-3 py-2 text-xs rounded-xl border border-line text-muted hover:text-ink transition-colors bg-panel">
                         Reset
                     </a>
                 @endif
@@ -219,7 +219,7 @@
         <!-- Devices Table -->
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
+                <thead class="bg-panel-alt text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
                         <th class="px-5 py-3.5">UID / Node Tracker</th>
                         <th class="px-5 py-3.5">Status & Mode</th>
@@ -244,11 +244,11 @@
                                 default => 1,
                             };
                         @endphp
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        <tr class="hover:bg-panel-alt/50 transition-colors">
                             <!-- Node UID & Name -->
                             <td class="px-5 py-3.5">
                                 <div class="font-semibold text-ink">
-                                    <a href="{{ route('solar-tracker', ['uid' => $device->uid]) }}" class="hover:text-blue-600 transition-colors">
+                                    <a href="{{ route('solar-tracker', ['uid' => $device->uid]) }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                         {{ $device->name }}
                                     </a>
                                 </div>
@@ -263,7 +263,7 @@
                             <td class="px-5 py-3.5">
                                 <div class="flex flex-col space-y-1 items-start">
                                     <x-status-pill :status="$device->status" />
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono border border-line bg-slate-50 text-muted uppercase">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono border border-line bg-panel-alt text-muted uppercase">
                                         Mode: {{ $device->mode }}
                                     </span>
                                 </div>
@@ -277,13 +277,13 @@
                                         <span class="text-ink font-medium">{{ $isOnline ? '99,8% Uptime' : ($device->status === 'unstable' ? '74,2% Uptime' : '0% Uptime') }}</span>
                                         <span>Sekarang</span>
                                     </div>
-                                    <div class="flex items-center space-x-0.5 h-4 p-0.5 rounded-lg border border-line bg-slate-50">
+                                    <div class="flex items-center space-x-0.5 h-4 p-0.5 rounded-lg border border-line bg-panel-alt">
                                         @foreach($slots as $slot)
                                             @php
                                                 $barColor = match($slot['status']) {
                                                     'online' => 'bg-emerald-500 hover:opacity-80',
                                                     'unstable' => 'bg-amber-500 hover:opacity-80',
-                                                    default => 'bg-slate-200 hover:bg-slate-300',
+                                                    default => 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600',
                                                 };
                                             @endphp
                                             <div 
@@ -299,10 +299,10 @@
                             <td class="px-5 py-3.5 font-mono text-xs">
                                 <div class="flex items-center space-x-1.5 text-ink font-medium">
                                     <div class="flex items-end space-x-0.5 h-3.5">
-                                        <div class="w-1 rounded-2xs h-1 {{ $signalBars >= 1 ? 'bg-emerald-500' : 'bg-slate-200' }}"></div>
-                                        <div class="w-1 rounded-2xs h-1.5 {{ $signalBars >= 2 ? 'bg-emerald-500' : 'bg-slate-200' }}"></div>
-                                        <div class="w-1 rounded-2xs h-2.5 {{ $signalBars >= 3 ? 'bg-emerald-500' : 'bg-slate-200' }}"></div>
-                                        <div class="w-1 rounded-2xs h-3.5 {{ $signalBars >= 4 ? 'bg-emerald-500' : 'bg-slate-200' }}"></div>
+                                        <div class="w-1 rounded-2xs h-1 {{ $signalBars >= 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700' }}"></div>
+                                        <div class="w-1 rounded-2xs h-1.5 {{ $signalBars >= 2 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700' }}"></div>
+                                        <div class="w-1 rounded-2xs h-2.5 {{ $signalBars >= 3 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700' }}"></div>
+                                        <div class="w-1 rounded-2xs h-3.5 {{ $signalBars >= 4 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700' }}"></div>
                                     </div>
                                     <span>{{ $device->rssi ? $device->rssi . ' dBm' : '-- dBm' }}</span>
                                 </div>
@@ -341,7 +341,7 @@
                             <td class="px-5 py-3.5 text-right">
                                 <a 
                                     href="{{ route('solar-tracker', ['uid' => $device->uid]) }}" 
-                                    class="inline-flex items-center px-3 py-1.5 rounded-lg border border-line bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 text-ink text-xs font-semibold transition-colors shadow-2xs"
+                                    class="inline-flex items-center px-3 py-1.5 rounded-lg border border-line bg-panel hover:bg-panel-alt hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800/60 text-ink text-xs font-semibold transition-colors shadow-2xs"
                                 >
                                     Detail &rarr;
                                 </a>
@@ -350,7 +350,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-5 py-12 text-center">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-100 text-muted mx-auto flex items-center justify-center mb-3">
+                                <div class="w-12 h-12 rounded-2xl bg-panel-alt text-muted mx-auto flex items-center justify-center mb-3">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
@@ -365,7 +365,7 @@
         </div>
 
         <!-- Table Footer / Legend -->
-        <div class="px-5 py-3.5 bg-slate-50/70 border-t border-line flex flex-col sm:flex-row items-center justify-between text-xs text-muted gap-2">
+        <div class="px-5 py-3.5 bg-panel-alt/60 border-t border-line flex flex-col sm:flex-row items-center justify-between text-xs text-muted gap-2">
             <div>
                 Menampilkan <span class="font-mono font-semibold text-ink">{{ $devices->count() }}</span> dari <span class="font-mono font-semibold text-ink">{{ $totalTrackers }}</span> perangkat terdaftar
             </div>
@@ -379,7 +379,7 @@
                     <span>Degradasi</span>
                 </span>
                 <span class="flex items-center space-x-1.5">
-                    <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
                     <span>Offline</span>
                 </span>
             </div>
