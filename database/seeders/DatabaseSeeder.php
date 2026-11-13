@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Default Site
+        // 1. Default Site (configured for ~130W dual-axis array system)
         $site = Site::firstOrCreate(
             ['name' => 'Cikarang Industrial Solar Pilot'],
             [
@@ -24,12 +24,22 @@ class DatabaseSeeder extends Seeder
                 'latitude' => -6.2944,
                 'longitude' => 107.1539,
                 'timezone' => 'Asia/Jakarta',
-                'daily_energy_target_kwh' => 50.00,
+                'daily_energy_target_kwh' => 3.50,
             ]
         );
 
-        // 2. Demo Devices
-        Device::firstOrCreate(
+        $site->update([
+            'daily_energy_target_kwh' => 3.50,
+        ]);
+
+        // 2. Demo Devices (all normal & online)
+        $dev1Settings = array_merge(Device::defaultSettings(), [
+            'daily_energy_target_kwh' => 1.20,
+            'misalignment_threshold_deg' => 5.0,
+            'wind_stow_ms' => 15.0,
+        ]);
+
+        Device::updateOrCreate(
             ['uid' => 'ST-DEMO-001'],
             [
                 'name' => 'Dual-Axis Pilot Array 01',
@@ -38,45 +48,43 @@ class DatabaseSeeder extends Seeder
                 'status' => 'online',
                 'mode' => 'auto',
                 'firmware' => '1.0.0',
-                'rssi' => -65,
-                'settings' => Device::defaultSettings(),
+                'rssi' => -62,
+                'settings' => $dev1Settings,
             ]
         );
 
-        Device::firstOrCreate(
+        Device::updateOrCreate(
             ['uid' => 'ST-PILOT-002'],
             [
                 'name' => 'Dual-Axis Pilot Array 02 (South Field)',
                 'site_id' => $site->id,
                 'mqtt_username' => 'device_ST-PILOT-002',
-                'status' => 'unstable',
+                'status' => 'online',
                 'mode' => 'auto',
                 'firmware' => '1.0.0',
-                'rssi' => -79,
-                'last_seen_at' => now()->subMinutes(12),
-                'settings' => Device::defaultSettings(),
+                'rssi' => -66,
+                'settings' => $dev1Settings,
             ]
         );
 
-        Device::firstOrCreate(
+        Device::updateOrCreate(
             ['uid' => 'ST-PILOT-003'],
             [
                 'name' => 'Dual-Axis Test Bench (Rooftop)',
                 'site_id' => $site->id,
                 'mqtt_username' => 'device_ST-PILOT-003',
-                'status' => 'offline',
-                'mode' => 'stow',
-                'firmware' => '0.9.8',
-                'rssi' => -92,
-                'last_seen_at' => now()->subHours(18),
-                'settings' => Device::defaultSettings(),
+                'status' => 'online',
+                'mode' => 'auto',
+                'firmware' => '1.0.0',
+                'rssi' => -64,
+                'settings' => $dev1Settings,
             ]
         );
 
-        // 3. Seed Telemetry & Hourly Rollups
+        // 3. Seed Telemetry & Hourly Rollups (130 W nominal & normal conditions)
         $this->call(TelemetrySeeder::class);
 
-        // 4. Seed Alerts and Commands
+        // 4. Seed Alerts and Commands (all normal / resolved)
         $this->call(AlertSeeder::class);
     }
 }
