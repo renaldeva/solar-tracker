@@ -1,116 +1,81 @@
-{{-- Core Telemetry Metric Grid (Alignment, DC Output, Actuators, Wind & Temperature) --}}
+{{-- Core 4 KPI Cards: Elevasi, Azimut, Angin, Output Listrik --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <!-- 1. Indikator Deviasi Total -->
-    <div class="bg-panel rounded-md border border-line p-4 flex flex-col justify-between">
-        <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __('Status Deviasi Total') }}</span>
-            @if($isAligned)
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border border-ok/30 bg-ok/10 text-ok">
-                    <span class="w-1.5 h-1.5 rounded-full bg-ok"></span>
-                    <span>ALIGNED</span>
-                </span>
-            @else
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border border-danger/30 bg-danger/10 text-danger">
-                    <span class="w-1.5 h-1.5 rounded-full bg-danger animate-pulse"></span>
-                    <span>DEV &gt; {{ formatNumberId($threshold, 1) }}&deg;</span>
-                </span>
-            @endif
+    <!-- 1. Elevasi -->
+    <x-kpi-card 
+        :title="__('Elevasi')" 
+        :value="formatNumberId($elevCurrent, 1)" 
+        unit="°"
+        tone="{{ abs($elevDeviation) <= 2.5 ? 'ok' : 'warn' }}"
+        badge="{{ abs($elevDeviation) <= 2.5 ? __('PRESISI') : __('KOREKSI') }}"
+        subtitle="{{ __('Target: ') . formatNumberId($elevTarget, 1) . '° · Dev: ' . ($elevDeviation >= 0 ? '+' : '') . formatNumberId($elevDeviation, 1) . '°' }}"
+    >
+        <x-slot:icon>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+        </x-slot:icon>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 flex items-center justify-between">
+            <span>{{ abs($elevDeviation) <= 2.5 ? __('Normal, panel sejajar matahari') : __('Aktuator pitch mengoreksi sudut') }}</span>
+            <span class="text-[10px] text-slate-400 font-mono">{{ __('BTS7960 Actuators') }}</span>
         </div>
+    </x-kpi-card>
 
-        <div class="flex items-baseline gap-1 my-1">
-            <span class="text-3xl font-bold font-mono tabular-nums {{ $isAligned ? 'text-ok' : 'text-danger' }} tracking-tight">
-                {{ formatNumberId($totalDeviation, 1) }}&deg;
-            </span>
-            <span class="text-xs font-mono text-muted">/ {{ formatNumberId($threshold, 1) }}&deg; maks</span>
+    <!-- 2. Azimut -->
+    <x-kpi-card 
+        :title="__('Azimut')" 
+        :value="formatNumberId($azCurrent, 1)" 
+        unit="°"
+        tone="{{ abs($azDeviation) <= 2.5 ? 'ok' : 'warn' }}"
+        badge="{{ abs($azDeviation) <= 2.5 ? __('PRESISI') : __('KOREKSI') }}"
+        subtitle="{{ __('Target: ') . formatNumberId($azTarget, 1) . '° · Dev: ' . ($azDeviation >= 0 ? '+' : '') . formatNumberId($azDeviation, 1) . '°' }}"
+    >
+        <x-slot:icon>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </x-slot:icon>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 flex items-center justify-between">
+            <span>{{ abs($azDeviation) <= 2.5 ? __('Normal, panel sejajar matahari') : __('Aktuator azimut sedang berputar') }}</span>
+            <span class="text-[10px] text-slate-400 font-mono">{{ $telemetry?->az_state ?? 'idle' }}</span>
         </div>
+    </x-kpi-card>
 
-        <div class="mt-2 pt-2 border-t border-line/50 flex items-center justify-between text-xs font-mono text-muted">
-            <span>Elev: {{ ($elevDeviation >= 0 ? '+' : '') . formatNumberId($elevDeviation, 1) }}&deg;</span>
-            <span>Az: {{ ($azDeviation >= 0 ? '+' : '') . formatNumberId($azDeviation, 1) }}&deg;</span>
+    <!-- 3. Angin (Alarm jika $isWindAlert) -->
+    <x-kpi-card 
+        :title="__('Kecepatan Angin')" 
+        :value="formatNumberId($telemetry?->wind_speed ?? 0, 1)" 
+        unit="m/s"
+        tone="{{ $isWindAlert ? 'danger' : 'ok' }}"
+        badge="{{ $isWindAlert ? __('ALARM STOW') : __('AMAN') }}"
+        subtitle="{{ __('Batas stow: ') . formatNumberId($windStowThreshold, 1) . ' m/s' }}"
+    >
+        <x-slot:icon>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </x-slot:icon>
+        <div class="text-[11px] font-medium mt-1 {{ $isWindAlert ? 'text-rose-600 font-semibold' : 'text-slate-500' }}">
+            {{ $isWindAlert ? __('Angin kencang, panel diamankan') : __('Angin aman, pelacakan aktif') }}
         </div>
-    </div>
+    </x-kpi-card>
 
-    <!-- 2. Output DC (PZEM-017 DC Array - Power in W only) -->
-    <div class="bg-panel rounded-md border border-line p-4 flex flex-col justify-between">
-        <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __('PZEM-017 DC Array') }}</span>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono border border-line bg-bg text-muted">
-                {{ $device->settings['measurement_label'] ?? __('Panel surya') }}
-            </span>
+    <!-- 4. Output Listrik (voltage, current, power in Watt) -->
+    <x-kpi-card 
+        :title="__('Output Listrik')" 
+        :value="formatPowerW($telemetry?->power ?? 0, false)" 
+        unit="W"
+        tone="accent"
+        badge="DC"
+        subtitle="{{ formatNumberId($telemetry?->voltage ?? 0, 1) . ' V · ' . formatNumberId($telemetry?->current ?? 0, 2) . ' A' }}"
+    >
+        <x-slot:icon>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        </x-slot:icon>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 flex items-center justify-between">
+            <span>{{ __('Akumulasi: ') . formatNumberId(($telemetry?->energy_wh ?? 0) / 1000.0, 2) . ' kWh' }}</span>
+            <span class="text-[10px] text-slate-400 font-mono">{{ __('PZEM-017 DC Array') }}</span>
         </div>
-
-        <div class="flex items-baseline gap-1 my-1">
-            <span class="text-3xl font-bold font-mono tabular-nums text-accent tracking-tight">
-                {{ formatPowerW($telemetry?->power ?? 0, false) }}
-            </span>
-            <span class="text-xs font-mono text-muted font-normal">W</span>
-        </div>
-
-        <div class="mt-2 pt-2 border-t border-line/50 flex items-center justify-between text-xs font-mono text-muted">
-            <span>{{ formatNumberId($telemetry?->voltage ?? 0, 1) }} V</span>
-            <span>&middot;</span>
-            <span>{{ formatNumberId($telemetry?->current ?? 0, 2) }} A</span>
-            <span>&middot;</span>
-            <span>{{ formatNumberId(($telemetry?->energy_wh ?? 0) / 1000.0, 2) }} kWh</span>
-        </div>
-    </div>
-
-    <!-- 3. Mode & Status Aktuator (BTS7960 Actuators) -->
-    <div class="bg-panel rounded-md border border-line p-4 flex flex-col justify-between">
-        <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __('BTS7960 Actuators') }}</span>
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border border-line bg-bg text-muted">
-                <span class="w-1.5 h-1.5 rounded-full {{ ($telemetry?->elev_state !== 'idle' || $telemetry?->az_state !== 'idle') ? 'bg-accent animate-pulse' : 'bg-muted' }}"></span>
-                <span>{{ strtoupper($device->mode) }}</span>
-            </span>
-        </div>
-
-        <div class="my-1 space-y-1 text-xs font-mono">
-            <div class="flex items-center justify-between">
-                <span class="text-muted">{{ __('Elev:') }}</span>
-                <span class="font-bold {{ $telemetry?->elev_state !== 'idle' ? 'text-accent' : 'text-ink' }}">
-                    {{ strtoupper($telemetry?->elev_state ?? 'IDLE') }} ({{ formatNumberId($telemetry?->elev_current ?? 0, 2) }} A)
-                </span>
-            </div>
-            <div class="flex items-center justify-between">
-                <span class="text-muted">{{ __('Azimuth:') }}</span>
-                <span class="font-bold {{ $telemetry?->az_state !== 'idle' ? 'text-accent' : 'text-ink' }}">
-                    {{ strtoupper($telemetry?->az_state ?? 'IDLE') }} ({{ formatNumberId($telemetry?->az_current ?? 0, 2) }} A)
-                </span>
-            </div>
-        </div>
-
-        <div class="mt-2 pt-2 border-t border-line/50 text-[11px] font-mono text-muted flex items-center justify-between">
-            <span>Driver: 24V DC BTS7960</span>
-            <span class="text-ink font-medium">{{ $telemetry?->firmware ?? 'v1.0' }}</span>
-        </div>
-    </div>
-
-    <!-- 4. Angin & Suhu Enclosure -->
-    <div class="bg-panel rounded-md border border-line p-4 flex flex-col justify-between">
-        <div class="flex items-start justify-between gap-2 mb-2">
-            <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __('Angin & Suhu Kotak') }}</span>
-            <span 
-                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border"
-                :class="'{{ $isWindAlert ? 'border-danger/30 bg-danger/10 text-danger' : 'border-ok/30 bg-ok/10 text-ok' }}'"
-            >
-                <span class="w-1.5 h-1.5 rounded-full {{ $isWindAlert ? 'bg-danger' : 'bg-ok' }}"></span>
-                <span>{{ $isWindAlert ? __('STOW LIMIT') : __('NOMINAL') }}</span>
-            </span>
-        </div>
-
-        <div class="flex items-baseline gap-1 my-1">
-            <span class="text-3xl font-bold font-mono tabular-nums {{ $isWindAlert ? 'text-danger' : 'text-ink' }} tracking-tight">
-                {{ formatNumberId($telemetry?->wind_speed ?? 0, 1) }}
-            </span>
-            <span class="text-xs font-mono text-muted font-normal">m/s</span>
-            <span class="text-[11px] font-mono text-muted ml-auto">Batas: {{ formatNumberId($windStowThreshold, 1) }} m/s</span>
-        </div>
-
-        <div class="mt-2 pt-2 border-t border-line/50 flex items-center justify-between text-xs font-mono text-muted">
-            <span>Suhu DS3231:</span>
-            <span class="text-ink font-bold">{{ formatNumberId($telemetry?->temp_c ?? 0, 1) }} &deg;C</span>
-        </div>
-    </div>
+    </x-kpi-card>
 </div>
-

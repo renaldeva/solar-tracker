@@ -1,21 +1,42 @@
 <x-layouts.app title="{{ __('Dual-Axis Solar Tracker') }}">
-    {{-- 1. Header, Device Selector, & High Wind Warning Banner --}}
+    {{-- 1. Header, Device Selector, & Large Alignment Status Card --}}
     @include('solar-tracker.header')
 
-    {{-- 2. Kinematics Orientation: Elevation Pitch & 360° Azimuth Compass --}}
-    @include('solar-tracker.kinematics')
-
-    {{-- 3. Core Telemetry Overview: Alignment, DC Output, Actuators, Wind & Temperature --}}
+    {{-- 2. 4 Core KPI Cards: Elevasi, Azimut, Angin, Output Listrik --}}
     @include('solar-tracker.telemetry-overview')
 
-    {{-- 4. Subsystems: BNO055 IMU Calibration & GPS / RTC Time Reference --}}
-    @include('solar-tracker.subsystems')
+    {{-- 3. Kinematics Orientation: Elevation Pitch & 360° Azimuth Compass --}}
+    @include('solar-tracker.kinematics')
 
-    {{-- 5. Supervisory Actuator Control Panel & Command Dispatch --}}
+    {{-- 4. Form Kirim Perintah (Kartu Terpisah Bersih) --}}
     @include('solar-tracker.commands')
 
-    {{-- 6. Recent Telemetry Event Log Table --}}
-    @include('solar-tracker.history')
+    {{-- 5. Bagian "Lihat Detail" (Kalibrasi IMU, GPS, RTC, Riwayat Telemetri) --}}
+    <div x-data="{ showTechDetail: false }" class="mb-6">
+        <button 
+            type="button" 
+            @click="showTechDetail = !showTechDetail" 
+            class="w-full flex items-center justify-between p-4 rounded-2xl border border-line bg-white hover:bg-slate-50 text-sm font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs"
+        >
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <span>{{ __('Lihat Detail Teknis (Kalibrasi IMU, GPS, RTC, dan Riwayat Data)') }}</span>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 transform transition-transform duration-200" :class="showTechDetail ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+
+        <div x-show="showTechDetail" x-cloak class="mt-4 space-y-6">
+            @include('solar-tracker.subsystems')
+            @include('solar-tracker.history')
+        </div>
+    </div>
 
     @push('scripts')
     <script>
@@ -54,13 +75,13 @@
             if (card) card.classList.remove('hidden');
             if (title) {
                 title.textContent = window.__ ? window.__("Mengirim perintah ':type'...", { type: type }) : `Mengirim '${type}'...`;
-                title.className = 'text-xs font-bold uppercase tracking-wider text-accent font-mono';
+                title.className = 'text-xs font-bold uppercase tracking-wider text-blue-600';
             }
             if (uuidLabel) uuidLabel.textContent = '';
             if (spinner) spinner.classList.remove('hidden');
             if (banner) {
-                banner.textContent = window.__ ? window.__('Mengirimkan payload perintah melalui broker MQTT Mosquitto...') : 'Mengirimkan payload perintah melalui broker MQTT Mosquitto...';
-                banner.className = 'text-xs text-muted font-mono bg-panel p-2.5 rounded border border-line';
+                banner.textContent = window.__ ? window.__('Mengirimkan payload perintah melalui broker MQTT...') : 'Mengirimkan payload perintah melalui broker MQTT...';
+                banner.className = 'text-xs text-muted bg-white p-3 rounded-lg border border-line';
             }
 
             setStepActive('step-sent');
@@ -95,11 +116,11 @@
                     if (spinner) spinner.classList.add('hidden');
                     if (title) {
                         title.textContent = window.__ ? window.__('Perintah Ditolak Interlock') : 'Perintah Ditolak Interlock';
-                        title.className = 'text-xs font-bold uppercase tracking-wider text-danger font-mono';
+                        title.className = 'text-xs font-bold uppercase tracking-wider text-rose-600';
                     }
                     if (banner) {
                         banner.textContent = data.message || (window.__ ? window.__('Penolakan interlock keselamatan atau hak akses.') : 'Penolakan interlock keselamatan atau hak akses.');
-                        banner.className = 'text-xs text-danger font-mono bg-danger/10 p-2.5 rounded border border-danger/30';
+                        banner.className = 'text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200';
                     }
                     setStepError('step-sent');
                     refreshCommandsLog();
@@ -109,11 +130,11 @@
                 if (spinner) spinner.classList.add('hidden');
                 if (title) {
                     title.textContent = window.__ ? window.__('Kesalahan Jaringan') : 'Kesalahan Jaringan';
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-danger font-mono';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-rose-600';
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Gagal berkomunikasi dengan backend aplikasi web.') : 'Gagal berkomunikasi dengan backend aplikasi web.';
-                    banner.className = 'text-xs text-danger font-mono bg-danger/10 p-2.5 rounded border border-danger/30';
+                    banner.className = 'text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200';
                 }
             }
         }
@@ -160,32 +181,32 @@
                 setStepSuccess('step-completed');
                 if (title) {
                     title.textContent = window.__ ? window.__('Eksekusi Selesai Berhasil') : 'Eksekusi Selesai Berhasil';
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-ok font-mono';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-emerald-600';
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Pelacak menyelesaikan target stroke pada :time. Aktuator menahan posisi.', { time: cmd.completed_at }) : `Pelacak menyelesaikan target stroke pada ${cmd.completed_at}. Aktuator menahan posisi.`;
-                    banner.className = 'text-xs text-ok font-mono bg-ok/10 p-2.5 rounded border border-ok/30';
+                    banner.className = 'text-xs text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200';
                 }
             } else if (cmd.status === 'rejected' || cmd.status === 'failed') {
                 if (spinner) spinner.classList.add('hidden');
                 if (title) {
                     title.textContent = window.__ ? window.__('Perintah :status', { status: cmd.status.toUpperCase() }) : `Perintah ${cmd.status.toUpperCase()}`;
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-danger font-mono';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-rose-600';
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Alasan: :reason', { reason: cmd.reason || (window.__('Kondisi keselamatan perangkat keras memicu penolakan.')) }) : `Alasan: ${cmd.reason || 'Kondisi keselamatan perangkat keras memicu penolakan.'}`;
-                    banner.className = 'text-xs text-danger font-mono bg-danger/10 p-2.5 rounded border border-danger/30';
+                    banner.className = 'text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200';
                 }
                 setStepError('step-executing');
             } else if (cmd.status === 'timeout') {
                 if (spinner) spinner.classList.add('hidden');
                 if (title) {
                     title.textContent = window.__ ? window.__('Perintah Waktu Habis') : 'Perintah Waktu Habis';
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-warn font-mono';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-amber-600';
                 }
                 if (banner) {
-                    banner.textContent = window.__ ? window.__('Perangkat tidak melaporkan penyelesaian dalam jendela batas waktu keselamatan.') : 'Perangkat tidak melaporkan penyelesaian dalam jendela batas waktu keselamatan.';
-                    banner.className = 'text-xs text-warn font-mono bg-warn/10 p-2.5 rounded border border-warn/30';
+                    banner.textContent = window.__ ? window.__('Perangkat tidak melaporkan penyelesaian dalam batas waktu keselamatan.') : 'Perangkat tidak melaporkan penyelesaian dalam batas waktu keselamatan.';
+                    banner.className = 'text-xs text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-200';
                 }
             }
         }
@@ -193,25 +214,25 @@
         function setStepActive(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2 rounded bg-accent/20 border border-accent/60 text-accent font-semibold animate-pulse font-mono text-xs';
+            el.className = 'p-2.5 rounded-lg bg-blue-50 border border-blue-300 text-blue-700 font-semibold animate-pulse text-xs';
         }
 
         function setStepSuccess(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2 rounded bg-ok/20 border border-ok/60 text-ok font-bold font-mono text-xs';
+            el.className = 'p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-700 font-bold text-xs';
         }
 
         function setStepError(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2 rounded bg-danger/20 border border-danger/60 text-danger font-bold font-mono text-xs';
+            el.className = 'p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-700 font-bold text-xs';
         }
 
         function setStepIdle(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2 rounded bg-panel border border-line text-muted font-medium font-mono text-xs';
+            el.className = 'p-2.5 rounded-lg bg-white border border-line text-muted font-medium text-xs';
         }
 
         async function refreshCommandsLog() {
@@ -229,23 +250,23 @@
                 }
 
                 tbody.innerHTML = data.commands.map(cmd => {
-                    let statusBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-accent/30 bg-accent/10 text-accent"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>${cmd.status}</span>`;
+                    let statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-blue-200 bg-blue-50 text-blue-700"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>${cmd.status}</span>`;
                     if (cmd.status === 'completed') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-ok/30 bg-ok/10 text-ok"><span class="w-1.5 h-1.5 rounded-full bg-ok"></span>${window.__ ? window.__('Completed') : 'Completed'}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-emerald-200 bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>${window.__ ? window.__('Completed') : 'Completed'}</span>`;
                     } else if (cmd.status === 'rejected' || cmd.status === 'failed') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-danger/30 bg-danger/10 text-danger" title="${cmd.reason || ''}"><span class="w-1.5 h-1.5 rounded-full bg-danger"></span>${cmd.status}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-rose-200 bg-rose-50 text-rose-700" title="${cmd.reason || ''}"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>${cmd.status}</span>`;
                     } else if (cmd.status === 'timeout') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-warn/30 bg-warn/10 text-warn"><span class="w-1.5 h-1.5 rounded-full bg-warn"></span>${window.__ ? window.__('Timeout') : 'Timeout'}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-amber-200 bg-amber-50 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>${window.__ ? window.__('Timeout') : 'Timeout'}</span>`;
                     }
 
                     return `
-                        <tr class="hover:bg-bg/40 transition-colors">
-                            <td class="px-3.5 py-2 text-muted whitespace-nowrap">${cmd.issued_at || '--'}</td>
-                            <td class="px-3.5 py-2 font-semibold text-ink whitespace-nowrap">${cmd.type}</td>
-                            <td class="px-3.5 py-2 text-muted max-w-xs truncate">${cmd.params ? JSON.stringify(cmd.params) : '--'}</td>
-                            <td class="px-3.5 py-2 whitespace-nowrap">${statusBadge}</td>
-                            <td class="px-3.5 py-2 text-muted whitespace-nowrap">${cmd.issued_by || 'System'}</td>
-                            <td class="px-3.5 py-2 text-right text-muted whitespace-nowrap">${cmd.duration_s !== null ? cmd.duration_s + 's' : '--'}</td>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-3.5 py-2.5 text-muted whitespace-nowrap font-mono">${cmd.issued_at || '--'}</td>
+                            <td class="px-3.5 py-2.5 font-semibold text-ink whitespace-nowrap">${cmd.type}</td>
+                            <td class="px-3.5 py-2.5 text-muted max-w-xs truncate font-mono text-[11px]">${cmd.params ? JSON.stringify(cmd.params) : '--'}</td>
+                            <td class="px-3.5 py-2.5 whitespace-nowrap">${statusBadge}</td>
+                            <td class="px-3.5 py-2.5 text-slate-700 whitespace-nowrap">${cmd.issued_by || 'System'}</td>
+                            <td class="px-3.5 py-2.5 text-right text-muted whitespace-nowrap font-mono">${cmd.duration_s !== null ? cmd.duration_s + 's' : '--'}</td>
                         </tr>
                     `;
                 }).join('');
