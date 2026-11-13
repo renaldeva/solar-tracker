@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             'daily_energy_target_kwh' => 3.50,
         ]);
 
-        // 2. Demo Devices (all normal & online)
+        // 2. Initial Devices
         $dev1Settings = array_merge(Device::defaultSettings(), [
             'daily_energy_target_kwh' => 1.20,
             'misalignment_threshold_deg' => 5.0,
@@ -45,10 +45,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Dual-Axis Pilot Array 01',
                 'site_id' => $site->id,
                 'mqtt_username' => 'device_ST-DEMO-001',
-                'status' => 'online',
+                'status' => 'offline',
                 'mode' => 'auto',
                 'firmware' => '1.0.0',
-                'rssi' => -62,
+                'rssi' => null,
                 'settings' => $dev1Settings,
             ]
         );
@@ -59,10 +59,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Dual-Axis Pilot Array 02 (South Field)',
                 'site_id' => $site->id,
                 'mqtt_username' => 'device_ST-PILOT-002',
-                'status' => 'online',
+                'status' => 'offline',
                 'mode' => 'auto',
                 'firmware' => '1.0.0',
-                'rssi' => -66,
+                'rssi' => null,
                 'settings' => $dev1Settings,
             ]
         );
@@ -73,18 +73,16 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Dual-Axis Test Bench (Rooftop)',
                 'site_id' => $site->id,
                 'mqtt_username' => 'device_ST-PILOT-003',
-                'status' => 'online',
+                'status' => 'offline',
                 'mode' => 'auto',
                 'firmware' => '1.0.0',
-                'rssi' => -64,
+                'rssi' => null,
                 'settings' => $dev1Settings,
             ]
         );
 
-        // 3. Seed Telemetry & Hourly Rollups (130 W nominal & normal conditions)
+        // 3. Telemetry & Alerts seeders (clean / no dummy data)
         $this->call(TelemetrySeeder::class);
-
-        // 4. Seed Alerts and Commands (all normal / resolved)
         $this->call(AlertSeeder::class);
     }
 }
