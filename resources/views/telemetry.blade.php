@@ -1,42 +1,48 @@
 <x-layouts.app :title="__('Telemetri')">
-    <!-- Page Header -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+    <x-page-header 
+        :title="__('Telemetry Data Explorer')" 
+        :subtitle="__('Filter metrik deret waktu di seluruh perangkat, periksa data mentah sensor, dan ekspor data telemetri.')"
+        :badge="__('Aliran Frekuensi Tinggi')"
+    >
+        <x-slot:actions>
             <div class="flex items-center space-x-2">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                    {{ __('Aliran Frekuensi Tinggi') }}
-                </span>
-                <span class="text-sm font-medium text-slate-400">{{ __('Paket Sensor Edge 5 Detik') }}</span>
+                <a 
+                    href="{{ route('telemetry.export', request()->all()) }}" 
+                    class="inline-flex items-center h-9 px-3 rounded-md border border-line bg-panel hover:bg-line/40 text-ink text-sm font-medium transition-colors"
+                    title="{{ __('Ekspor CSV') }}"
+                >
+                    <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>{{ __('Ekspor CSV') }}</span>
+                </a>
+                <a 
+                    href="{{ route('solar-tracker', ['uid' => $device->uid ?? '']) }}" 
+                    class="inline-flex items-center h-9 px-3 rounded-md bg-accent text-ink text-sm font-medium hover:bg-blue-600 transition-colors"
+                >
+                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>{{ __('Kontrol Langsung') }}</span>
+                </a>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-1">{{ __('Telemetry Data Explorer') }}</h1>
-            <p class="text-sm text-slate-500 mt-1">{{ __('Filter metrik deret waktu di seluruh perangkat, periksa data mentah sensor, dan ekspor kumpulan data rekayasa.') }}</p>
-        </div>
+        </x-slot:actions>
+    </x-page-header>
 
-        <div class="flex items-center space-x-2">
-            <a href="{{ route('telemetry.export', request()->all()) }}" class="inline-flex items-center px-4 py-2.5 rounded-lg bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition-colors h-11 min-h-[44px]">
-                <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                {{ __('Ekspor CSV') }}
-            </a>
-            <a href="{{ route('solar-tracker') }}" class="inline-flex items-center px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-xs transition-colors h-11 min-h-[44px]">
-                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {{ __('Kontrol Langsung') }}
-            </a>
-        </div>
-    </div>
-
-    <!-- Filter Toolbar Card -->
-    <div class="bg-white rounded-xl border border-slate-200/80 shadow-2xs p-6 mb-6">
+    <!-- Filter & Control Toolbar -->
+    <div class="bg-panel border border-line rounded-md p-4 mb-6" x-data="{ rangeMode: '{{ $selectedRange }}' }">
         <form method="GET" action="{{ route('telemetry') }}" id="telemetryFilterForm" class="space-y-4">
-            <!-- Top Controls Row -->
+            <!-- Row 1: Device Selector & Range -->
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <!-- Device Picker -->
                 <div class="flex items-center space-x-2">
-                    <label for="filter-device" class="text-sm font-semibold text-slate-700">{{ __('Perangkat:') }}</label>
-                    <select id="filter-device" name="device" onchange="this.form.submit()" class="text-sm font-medium bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 h-11 min-h-[44px]">
+                    <label for="filter-device" class="text-xs font-semibold text-muted uppercase tracking-wider">{{ __('Perangkat:') }}</label>
+                    <select 
+                        id="filter-device" 
+                        name="device" 
+                        onchange="this.form.submit()" 
+                        class="text-xs font-medium bg-bg border border-line rounded-md px-3 py-1.5 text-ink focus:outline-none focus:border-accent"
+                    >
                         @foreach($devices as $dev)
                             <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
                                 {{ $dev->name }} ({{ $dev->uid }})
@@ -45,35 +51,114 @@
                     </select>
                 </div>
 
-                <!-- Time Range Buttons -->
-                <div class="flex items-center space-x-1.5 bg-slate-100 p-1.5 rounded-lg">
-                    @foreach(['1h' => __('1 Jam'), '6h' => __('6 Jam'), '24h' => __('24 Jam'), '7d' => __('7 Hari')] as $val => $label)
-                        <button type="submit" name="range" value="{{ $val }}" 
-                                class="px-3.5 py-2 text-sm font-semibold rounded-md transition-colors h-9 {{ $selectedRange === $val ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-600 hover:text-slate-900' }}">
+                <!-- Range Buttons -->
+                <div class="flex flex-wrap items-center gap-1">
+                    @foreach(['1h' => '1 Jam', '6h' => '6 Jam', '24h' => '24 Jam', '7d' => '7 Hari'] as $val => $label)
+                        <button 
+                            type="submit" 
+                            name="range" 
+                            value="{{ $val }}" 
+                            @click="rangeMode = '{{ $val }}'"
+                            class="px-2.5 py-1 text-xs font-mono rounded transition-colors {{ $selectedRange === $val ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}"
+                        >
                             {{ $label }}
                         </button>
                     @endforeach
+                    <button 
+                        type="button" 
+                        @click="rangeMode = 'custom'" 
+                        :class="rangeMode === 'custom' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line'"
+                        class="px-2.5 py-1 text-xs font-mono rounded transition-colors cursor-pointer"
+                    >
+                        Kustom
+                    </button>
                 </div>
             </div>
 
+            <!-- Custom Date Inputs (shown when range is custom) -->
+            <div x-show="rangeMode === 'custom'" x-cloak class="pt-3 border-t border-line flex flex-wrap items-center gap-3">
+                <input type="hidden" name="range" value="custom">
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="text-muted">Dari:</span>
+                    <input 
+                        type="datetime-local" 
+                        name="start_date" 
+                        value="{{ $startDate }}" 
+                        class="bg-bg border border-line rounded px-2.5 py-1 text-xs text-ink focus:outline-none focus:border-accent font-mono"
+                    >
+                </div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="text-muted">Sampai:</span>
+                    <input 
+                        type="datetime-local" 
+                        name="end_date" 
+                        value="{{ $endDate }}" 
+                        class="bg-bg border border-line rounded px-2.5 py-1 text-xs text-ink focus:outline-none focus:border-accent font-mono"
+                    >
+                </div>
+                <button 
+                    type="submit" 
+                    class="px-3 py-1 rounded bg-accent text-ink text-xs font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+                >
+                    Terapkan Rentang
+                </button>
+            </div>
+
             <!-- Metric Multi-Select Badges Row -->
-            <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
-                <span class="text-sm font-semibold text-slate-500 mr-2">{{ __('Metrik Terlihat:') }}</span>
+            <div class="pt-3 border-t border-line flex flex-wrap items-center gap-2">
+                <span class="text-xs font-semibold text-muted uppercase tracking-wider mr-2">{{ __('Metrik Terlihat:') }}</span>
                 @php
                     $availableMetrics = [
-                        'power' => ['label' => __('Daya (W)'), 'class' => 'text-blue-700 bg-blue-50 border-blue-200'],
-                        'voltage' => ['label' => __('Tegangan (V)'), 'class' => 'text-amber-700 bg-amber-50 border-amber-200'],
-                        'current' => ['label' => __('Arus (A)'), 'class' => 'text-emerald-700 bg-emerald-50 border-emerald-200'],
-                        'wind_speed' => ['label' => __('Kecepatan Angin (m/s)'), 'class' => 'text-red-700 bg-red-50 border-red-200'],
-                        'pitch_elev' => ['label' => __('Elevasi (°)'), 'class' => 'text-purple-700 bg-purple-50 border-purple-200'],
-                        'azimuth' => ['label' => __('Azimut (°)'), 'class' => 'text-cyan-700 bg-cyan-50 border-cyan-200'],
-                        'temp_c' => ['label' => __('Suhu Panel (°C)'), 'class' => 'text-rose-700 bg-rose-50 border-rose-200'],
+                        'power' => [
+                            'label' => __('Daya (W)'), 
+                            'active_class' => 'text-blue-400 bg-blue-500/10 border-blue-500/40',
+                            'dot' => 'bg-blue-500'
+                        ],
+                        'voltage' => [
+                            'label' => __('Tegangan (V)'), 
+                            'active_class' => 'text-amber-400 bg-amber-500/10 border-amber-500/40',
+                            'dot' => 'bg-amber-500'
+                        ],
+                        'current' => [
+                            'label' => __('Arus (A)'), 
+                            'active_class' => 'text-emerald-400 bg-emerald-500/10 border-emerald-500/40',
+                            'dot' => 'bg-emerald-500'
+                        ],
+                        'wind_speed' => [
+                            'label' => __('Kecepatan Angin (m/s)'), 
+                            'active_class' => 'text-rose-400 bg-rose-500/10 border-rose-500/40',
+                            'dot' => 'bg-rose-500'
+                        ],
+                        'pitch_elev' => [
+                            'label' => __('Elevasi (°)'), 
+                            'active_class' => 'text-purple-400 bg-purple-500/10 border-purple-500/40',
+                            'dot' => 'bg-purple-500'
+                        ],
+                        'azimuth' => [
+                            'label' => __('Azimut (°)'), 
+                            'active_class' => 'text-cyan-400 bg-cyan-500/10 border-cyan-500/40',
+                            'dot' => 'bg-cyan-500'
+                        ],
+                        'temp_c' => [
+                            'label' => __('Suhu Panel (°C)'), 
+                            'active_class' => 'text-pink-400 bg-pink-500/10 border-pink-500/40',
+                            'dot' => 'bg-pink-500'
+                        ],
                     ];
                 @endphp
 
                 @foreach($availableMetrics as $key => $meta)
-                    <label class="cursor-pointer inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all {{ in_array($key, $selectedMetrics) ? $meta['class'] : 'bg-slate-50 text-slate-400 border-slate-200' }}">
-                        <input type="checkbox" name="metrics[]" value="{{ $key }}" onchange="document.getElementById('telemetryFilterForm').submit()" {{ in_array($key, $selectedMetrics) ? 'checked' : '' }} class="rounded text-blue-600 focus:ring-0 w-4 h-4">
+                    @php $checked = in_array($key, $selectedMetrics, true); @endphp
+                    <label class="cursor-pointer inline-flex items-center space-x-2 px-2.5 py-1 rounded border text-xs font-medium transition-all {{ $checked ? $meta['active_class'] : 'bg-bg/50 text-muted border-line opacity-60 hover:opacity-100' }}">
+                        <input 
+                            type="checkbox" 
+                            name="metrics[]" 
+                            value="{{ $key }}" 
+                            onchange="document.getElementById('telemetryFilterForm').submit()" 
+                            {{ $checked ? 'checked' : '' }} 
+                            class="sr-only"
+                        >
+                        <span class="w-2 h-2 rounded-full {{ $checked ? $meta['dot'] : 'bg-line' }}"></span>
                         <span>{{ $meta['label'] }}</span>
                     </label>
                 @endforeach
@@ -81,23 +166,22 @@
         </form>
     </div>
 
-    <!-- Chart Card -->
+    <!-- Chart Panel -->
     <div 
-        x-data="telemetryChartComponent(@js($chartData), '{{ $device->uid ?? '' }}', '{{ $selectedRange }}', @js($selectedMetrics))" 
-        class="bg-white rounded-xl border border-slate-200/80 shadow-2xs p-6 mb-6"
+        x-data="telemetryChartComponent(@js($chartData), '{{ $device->uid ?? '' }}', '{{ $selectedRange }}', @js($selectedMetrics), '{{ $startDate ?? '' }}', '{{ $endDate ?? '' }}')" 
+        class="bg-panel border border-line rounded-md p-4 mb-6"
     >
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">{{ __('Bentuk Gelombang Deret Waktu') }}</h2>
-                <p class="text-xs sm:text-sm text-slate-400 mt-0.5">{{ __('Titik sensor resolusi tinggi pada rentang yang dipilih') }}</p>
-            </div>
+        <div class="flex items-center justify-between pb-3 border-b border-line mb-3">
             <div class="flex items-center space-x-3">
-                <span class="text-sm font-mono text-slate-500">
-                    <span class="font-bold text-slate-800" x-text="chartData.total_count"></span> {{ __('rekaman ditemukan') }}
+                <h2 class="text-sm font-semibold text-ink">{{ __('Bentuk Gelombang Deret Waktu') }}</h2>
+                <span class="text-xs text-muted font-mono">
+                    <span class="text-ink font-semibold" x-text="chartData.total_count"></span> {{ __('rekaman') }}
                 </span>
-                <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                    {{ __('ALIRAN LANGSUNG') }}
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold border border-ok/30 text-ok bg-ok/10">
+                    <span class="w-1.5 h-1.5 rounded-full bg-ok mr-1.5 animate-pulse"></span>
+                    {{ __('STREAM AKTIF (5s)') }}
                 </span>
             </div>
         </div>
@@ -107,72 +191,81 @@
     </div>
 
     <!-- High-Density Telemetry Table -->
-    <div class="bg-white rounded-xl border border-slate-200/80 shadow-2xs overflow-hidden">
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="text-base font-bold text-slate-900">{{ __('Paket Sensor Terekam') }}</h3>
-            <span class="text-sm text-slate-500">{{ __('Waktu ditampilkan dalam UTC+7 (WIB)') }}</span>
+    <div class="bg-panel border border-line rounded-md overflow-hidden mb-6">
+        <div class="p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+                <h3 class="text-sm font-semibold text-ink">{{ __('Paket Sensor Terekam') }}</h3>
+                <p class="text-xs text-muted mt-0.5">{{ __('Waktu ditampilkan dalam UTC+7 (WIB)') }}</p>
+            </div>
+            <div class="text-xs font-mono text-muted">
+                {{ __('Halaman :current dari :total (:count total data)', [
+                    'current' => $telemetries->currentPage(),
+                    'total' => $telemetries->lastPage(),
+                    'count' => $telemetries->total()
+                ]) }}
+            </div>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100 text-xs uppercase">
+                <thead class="bg-bg/40 text-muted uppercase text-xs tracking-wider border-b border-line">
                     <tr>
-                        <th class="py-3 px-4">{{ __('Waktu (WIB)') }}</th>
-                        <th class="py-3 px-4">{{ __('Mode') }}</th>
-                        <th class="py-3 px-4">{{ __('Tegangan') }}</th>
-                        <th class="py-3 px-4">{{ __('Arus') }}</th>
-                        <th class="py-3 px-4">{{ __('Daya') }}</th>
-                        <th class="py-3 px-4">{{ __('Kumulatif Wh') }}</th>
-                        <th class="py-3 px-4">{{ __('Kecepatan Angin') }}</th>
-                        <th class="py-3 px-4">{{ __('Elevasi') }}</th>
-                        <th class="py-3 px-4">{{ __('Azimut') }}</th>
-                        <th class="py-3 px-4">{{ __('Suhu (°C)') }}</th>
-                        <th class="py-3 px-4">{{ __('Sinyal GPS') }}</th>
-                        <th class="py-3 px-4">{{ __('Kalibrasi IMU') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Waktu (WIB)') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Mode') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Tegangan') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Arus') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Daya') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Kumulatif Wh') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Kecepatan Angin') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Elevasi') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Azimut') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Suhu') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Sinyal GPS') }}</th>
+                        <th class="py-2.5 px-3 font-medium">{{ __('Kalibrasi IMU') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 font-mono text-xs sm:text-sm">
+                <tbody class="divide-y divide-line font-mono text-xs">
                     @forelse($telemetries as $tel)
-                        <tr class="hover:bg-slate-50/60 transition-colors h-[52px]">
-                            <td class="py-3 px-4 font-sans font-medium text-slate-800 whitespace-nowrap">
-                                {{ $tel->recorded_at ? $tel->recorded_at->setTimezone('Asia/Jakarta')->translatedFormat('d M H:i:s') . ' WIB' : '--' }}
+                        <tr class="hover:bg-line/20 transition-colors">
+                            <td class="py-2.5 px-3 font-mono text-ink whitespace-nowrap">
+                                {{ $tel->recorded_at ? $tel->recorded_at->setTimezone('Asia/Jakarta')->format('d M H:i:s') . ' WIB' : '--' }}
                             </td>
-                            <td class="py-3 px-4">
-                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase font-sans
-                                    {{ $tel->mode === 'auto' ? 'bg-blue-50 text-blue-700' : ($tel->mode === 'stow' ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-700') }}">
-                                    {{ match(strtolower($tel->mode)) { 'auto' => __('Otomatis'), 'manual' => __('Manual'), 'stow' => __('Mode Aman (Stow)'), default => strtoupper($tel->mode) } }}
+                            <td class="py-2.5 px-3">
+                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono uppercase border border-line
+                                    {{ $tel->mode === 'auto' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : ($tel->mode === 'stow' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-bg text-muted') }}">
+                                    {{ match(strtolower($tel->mode)) { 'auto' => __('Otomatis'), 'manual' => __('Manual'), 'stow' => __('Stow'), default => strtoupper($tel->mode) } }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-slate-700">{{ app()->getLocale() === 'id' ? formatNumberId($tel->voltage, 1) : number_format($tel->voltage, 1) }} V</td>
-                            <td class="py-3 px-4 text-slate-700">{{ app()->getLocale() === 'id' ? formatNumberId($tel->current, 2) : number_format($tel->current, 2) }} A</td>
-                            <td class="py-3 px-4 font-bold text-blue-600">{{ app()->getLocale() === 'id' ? formatPowerW($tel->power) : number_format($tel->power, 1) . ' W' }}</td>
-                            <td class="py-3 px-4 text-slate-500">{{ app()->getLocale() === 'id' ? formatNumberId($tel->energy_wh, 0) : number_format($tel->energy_wh, 0) }} Wh</td>
-                            <td class="py-3 px-4 {{ $tel->wind_speed >= 15.0 ? 'text-red-600 font-bold' : 'text-slate-700' }}">
-                                {{ app()->getLocale() === 'id' ? formatNumberId($tel->wind_speed, 1) : number_format($tel->wind_speed, 1) }} m/s
+                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->voltage, 1) }} V</td>
+                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->current, 2) }} A</td>
+                            <td class="py-2.5 px-3 font-bold text-accent">{{ formatPowerW($tel->power) }}</td>
+                            <td class="py-2.5 px-3 text-muted">{{ formatNumberId($tel->energy_wh, 0) }} Wh</td>
+                            <td class="py-2.5 px-3 {{ $tel->wind_speed >= 15.0 ? 'text-danger font-bold' : 'text-ink' }}">
+                                {{ formatNumberId($tel->wind_speed, 1) }} m/s
                             </td>
-                            <td class="py-3 px-4 text-slate-700">
-                                {{ app()->getLocale() === 'id' ? formatNumberId($tel->pitch_elev, 1) : number_format($tel->pitch_elev, 1) }}&deg;
-                                <span class="text-slate-400 text-xs">({{ app()->getLocale() === 'id' ? formatNumberId($tel->target_elev, 1) : number_format($tel->target_elev, 1) }}&deg;)</span>
+                            <td class="py-2.5 px-3 text-ink">
+                                {{ formatNumberId($tel->pitch_elev, 1) }}&deg;
+                                <span class="text-muted text-[11px]">({{ formatNumberId($tel->target_elev, 1) }}&deg;)</span>
                             </td>
-                            <td class="py-3 px-4 text-slate-700">
-                                {{ app()->getLocale() === 'id' ? formatNumberId($tel->azimuth, 1) : number_format($tel->azimuth, 1) }}&deg;
-                                <span class="text-slate-400 text-xs">({{ app()->getLocale() === 'id' ? formatNumberId($tel->target_az, 1) : number_format($tel->target_az, 1) }}&deg;)</span>
+                            <td class="py-2.5 px-3 text-ink">
+                                {{ formatNumberId($tel->azimuth, 1) }}&deg;
+                                <span class="text-muted text-[11px]">({{ formatNumberId($tel->target_az, 1) }}&deg;)</span>
                             </td>
-                            <td class="py-3 px-4 text-slate-700">{{ app()->getLocale() === 'id' ? formatNumberId($tel->temp_c, 1) : number_format($tel->temp_c, 1) }}&deg;C</td>
-                            <td class="py-3 px-4">
-                                <span class="font-sans text-xs font-semibold {{ $tel->fix ? 'text-emerald-600' : 'text-amber-600' }}">
-                                    {{ $tel->fix ? __('Sinyal 3D') . ' (' . $tel->satellites . 's)' : __('Belum Ada Sinyal') }}
+                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->temp_c, 1) }}&deg;C</td>
+                            <td class="py-2.5 px-3">
+                                <span class="text-[11px] {{ $tel->fix ? 'text-ok font-semibold' : 'text-warn' }}">
+                                    {{ $tel->fix ? '3D (' . $tel->satellites . 's)' : 'No Fix' }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 font-sans">
-                                <span class="px-2 py-0.5 rounded text-xs font-bold font-mono {{ $tel->cal_sys >= 2 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
+                            <td class="py-2.5 px-3">
+                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono border {{ $tel->cal_sys >= 2 ? 'border-ok/30 text-ok bg-ok/10' : 'border-warn/30 text-warn bg-warn/10' }}">
                                     Sys:{{ $tel->cal_sys ?? 0 }}
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" class="p-8 text-center text-slate-400 font-sans text-sm">
+                            <td colspan="12" class="p-8 text-center text-muted font-sans text-sm">
                                 {{ __('Tidak ada data telemetri ditemukan untuk perangkat dan rentang waktu yang dipilih.') }}
                             </td>
                         </tr>
@@ -182,7 +275,7 @@
         </div>
 
         @if($telemetries->hasPages())
-            <div class="p-4 border-t border-slate-100">
+            <div class="p-3 border-t border-line bg-bg/40">
                 {{ $telemetries->links() }}
             </div>
         @endif
@@ -190,12 +283,14 @@
 
     @push('scripts')
     <script>
-        function telemetryChartComponent(initialChartData, deviceUid, range, selectedMetrics) {
+        function telemetryChartComponent(initialChartData, deviceUid, range, selectedMetrics, startDate, endDate) {
             return {
                 chartData: initialChartData,
                 deviceUid: deviceUid,
                 range: range,
                 selectedMetrics: selectedMetrics,
+                startDate: startDate,
+                endDate: endDate,
                 chart: null,
                 pollTimer: null,
 
@@ -214,20 +309,43 @@
                     if (this.pollTimer) clearInterval(this.pollTimer);
                 },
 
+                configureMultiAxis(datasets) {
+                    const hasPower = datasets.some(ds => {
+                        const l = (ds.label || '').toLowerCase();
+                        return l.includes('power') || l.includes('daya') || l.includes('(w)');
+                    });
+
+                    datasets.forEach((ds, idx) => {
+                        const l = (ds.label || '').toLowerCase();
+                        if (hasPower) {
+                            ds.yAxisID = (l.includes('power') || l.includes('daya') || l.includes('(w)')) ? 'y' : 'y1';
+                        } else {
+                            ds.yAxisID = idx === 0 ? 'y' : 'y1';
+                        }
+                    });
+                },
+
                 refreshChartData() {
                     const metricsParam = this.selectedMetrics.join(',');
-                    fetch(`/telemetry/data?device=${this.deviceUid}&range=${this.range}&metrics=${metricsParam}`)
+                    let url = `/telemetry/data?device=${encodeURIComponent(this.deviceUid)}&range=${encodeURIComponent(this.range)}&metrics=${encodeURIComponent(metricsParam)}`;
+                    if (this.range === 'custom') {
+                        if (this.startDate) url += `&start_date=${encodeURIComponent(this.startDate)}`;
+                        if (this.endDate) url += `&end_date=${encodeURIComponent(this.endDate)}`;
+                    }
+
+                    fetch(url)
                         .then(res => res.json())
                         .then(data => {
                             if (!data || !data.labels) return;
                             this.chartData = data;
                             if (this.chart) {
+                                this.configureMultiAxis(data.datasets);
                                 this.chart.data.labels = data.labels;
                                 this.chart.data.datasets = data.datasets;
                                 this.chart.update('none');
                             }
                         })
-                        .catch(err => console.debug('Telemetry polling pause:', err));
+                        .catch(err => console.debug('Telemetry polling paused:', err));
                 },
 
                 renderChart() {
@@ -235,32 +353,46 @@
                     if (!ctx) return;
 
                     const numberFmt = new Intl.NumberFormat('id-ID');
+                    const datasets = this.chartData.datasets || [];
+                    this.configureMultiAxis(datasets);
+
+                    const hasSecondary = datasets.some(ds => ds.yAxisID === 'y1');
 
                     this.chart = new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: this.chartData.labels,
-                            datasets: this.chartData.datasets
+                            labels: this.chartData.labels || [],
+                            datasets: datasets
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
                             plugins: {
                                 legend: {
                                     display: true,
                                     position: 'top',
                                     labels: {
-                                        boxWidth: 14,
-                                        font: { size: 14, family: 'Inter' },
-                                        color: '#475569'
+                                        boxWidth: 12,
+                                        boxHeight: 12,
+                                        font: { size: 12, family: 'Inter' },
+                                        color: '#9ca3af',
+                                        padding: 14
                                     }
                                 },
                                 tooltip: {
-                                    backgroundColor: '#0f172a',
+                                    backgroundColor: '#1f2937',
+                                    titleColor: '#f9fafb',
+                                    bodyColor: '#f9fafb',
+                                    borderColor: '#374151',
+                                    borderWidth: 1,
                                     padding: 10,
-                                    titleFont: { size: 13, family: 'Inter' },
-                                    bodyFont: { size: 13, family: 'Inter' },
-                                    cornerRadius: 8,
+                                    titleFont: { size: 12, family: 'Inter' },
+                                    bodyFont: { size: 12, family: 'JetBrains Mono' },
+                                    cornerRadius: 6,
                                     callbacks: {
                                         label: function(context) {
                                             const label = context.dataset.label || '';
@@ -272,15 +404,34 @@
                             },
                             scales: {
                                 x: {
-                                    grid: { color: 'rgba(241, 245, 249, 1)' },
-                                    ticks: { font: { size: 13, family: 'Inter' }, color: '#64748b', maxTicksLimit: 12 }
+                                    grid: { color: '#374151', drawTicks: false },
+                                    ticks: {
+                                        font: { size: 11, family: 'JetBrains Mono' },
+                                        color: '#9ca3af',
+                                        maxTicksLimit: 12
+                                    }
                                 },
                                 y: {
-                                    beginAtZero: true,
-                                    grid: { color: 'rgba(241, 245, 249, 1)' },
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    grid: { color: '#374151', drawTicks: false },
                                     ticks: {
-                                        font: { size: 13, family: 'Inter' },
-                                        color: '#64748b',
+                                        font: { size: 11, family: 'JetBrains Mono' },
+                                        color: '#9ca3af',
+                                        callback: function(value) {
+                                            return numberFmt.format(value);
+                                        }
+                                    }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: hasSecondary,
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false },
+                                    ticks: {
+                                        font: { size: 11, family: 'JetBrains Mono' },
+                                        color: '#9ca3af',
                                         callback: function(value) {
                                             return numberFmt.format(value);
                                         }
