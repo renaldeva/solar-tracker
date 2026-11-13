@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ProcessAck;
+use App\Jobs\ProcessStatus;
+use App\Jobs\ProcessTelemetry;
 use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Command as DeviceCommand;
 use App\Models\Device;
-use App\Models\Site;
 use App\Models\Telemetry;
 use App\Services\AlertEngineService;
 use Carbon\Carbon;
@@ -86,34 +88,40 @@ class MqttListenCommand extends Command
 
         while ($this->running) {
             try {
-                $host = config('mqtt-client.connections.default.host', 'mosquitto');
-                $port = config('mqtt-client.connections.default.port', 1883);
+                $uid = config('mqtt.device_uid', 'ST-DEMO-001');
+                $host = config('mqtt.host', config('mqtt-client.connections.default.host', '10.132.15.43'));
+                $port = config('mqtt.port', config('mqtt-client.connections.default.port', 1884));
 
                 $this->info("Connecting to MQTT broker at {$host}:{$port}...");
                 $mqtt = MQTT::connection('default');
-                $this->info('Connected successfully as solar_backend. Subscribing to topics...');
+                $this->info("Connected successfully. Subscribing to tracker/{$uid}/# with QoS 1...");
 
-                // 1. Telemetry topic: tracker/{uid}/telemetry
+                // 1. Telemetry topic: tracker/{uid}/telemetry with QoS 1
+                $mqtt->subscribe("tracker/{$uid}/telemetry", function (string $topic, string $message) {
+                    $this->handleTelemetry($topic, $message);
+                }, 1);
+
+                // Wildcard subscription for other/additional tracker nodes
                 $mqtt->subscribe('tracker/+/telemetry', function (string $topic, string $message) {
                     $this->handleTelemetry($topic, $message);
-                }, 0);
+                }, 1);
 
-                // 2. Status & LWT topic: tracker/{uid}/status
+                // 2. Status & LWT topic: tracker/{uid}/status with QoS 1
                 $mqtt->subscribe('tracker/+/status', function (string $topic, string $message) {
                     $this->handleStatus($topic, $message);
                 }, 1);
 
-                // 3. Event topic: tracker/{uid}/event
+                // 3. Event topic: tracker/{uid}/event with QoS 1
                 $mqtt->subscribe('tracker/+/event', function (string $topic, string $message) {
                     $this->handleEvent($topic, $message);
                 }, 1);
 
-                // 4. Command Ack topic: tracker/{uid}/ack
+                // 4. Command Ack topic: tracker/{uid}/ack with QoS 1
                 $mqtt->subscribe('tracker/+/ack', function (string $topic, string $message) {
                     $this->handleAck($topic, $message);
                 }, 1);
 
-                $this->info('Subscribed to tracker/+/telemetry, status, event, ack. Entering event loop.');
+                $this->info("Subscribed to tracker/{$uid}/# (telemetry, status, event, ack) with QoS 1. Entering event loop.");
 
                 // Run client loop
                 $mqtt->loop(true);
@@ -150,28 +158,6 @@ class MqttListenCommand extends Command
             return;
         }
 
-        $device = Device::where('uid', $uid)->first();
-        if (! $device) {
-            $site = Site::first();
-            if ($site) {
-                $device = Device::create([
-                    'uid' => $uid,
-                    'name' => "Tracker {$uid}",
-                    'site_id' => $site->id,
-                    'mqtt_username' => "device_{$uid}",
-                    'status' => 'online',
-                    'mode' => 'auto',
-                    'firmware' => '1.0.0',
-                    'settings' => Device::defaultSettings(),
-                ]);
-                $this->info("Auto-provisioned new device in database: {$uid}");
-            } else {
-                $this->warn("Telemetry received for unknown device UID: {$uid}");
-
-                return;
-            }
-        }
-
         $payload = json_decode($message, true);
         if (! is_array($payload)) {
             $this->error("Malformed JSON telemetry for device {$uid}");
@@ -179,88 +165,18 @@ class MqttListenCommand extends Command
             return;
         }
 
-        // Parse timestamp safely from DS3231 RTC
-        $recordedAt = Carbon::now('UTC');
-        if (! empty($payload['timestamp'])) {
-            if (is_numeric($payload['timestamp'])) {
-                $recordedAt = Carbon::createFromTimestampUTC((int) $payload['timestamp']);
-            } else {
-                $recordedAt = Carbon::parse($payload['timestamp'])->setTimezone('UTC');
-            }
-        }
-
-        $receivedAt = Carbon::now('UTC');
-
-        // Extract sensor groups safely (never assume presence)
-        $pzem = $payload['pzem'] ?? [];
-        $wind = $payload['wind'] ?? [];
-        $imu = $payload['imu'] ?? [];
-        $target = $payload['target'] ?? [];
-        $actuators = $payload['actuators'] ?? [];
-        $gps = $payload['gps'] ?? [];
-        $rtc = $payload['rtc'] ?? [];
-        $flags = $payload['flags'] ?? [];
-
-        // Ingest into telemetry table
-        Telemetry::create([
-            'device_id' => $device->id,
-            'recorded_at' => $recordedAt,
-            'received_at' => $receivedAt,
-            'firmware' => $payload['firmware'] ?? $device->firmware,
-            'rssi' => $payload['rssi'] ?? null,
-            'uptime_s' => $payload['uptime_s'] ?? null,
-            'mode' => $payload['mode'] ?? $device->mode,
-            'voltage' => isset($pzem['voltage']) ? (float) $pzem['voltage'] : null,
-            'current' => isset($pzem['current']) ? (float) $pzem['current'] : null,
-            'power' => isset($pzem['power']) ? (float) $pzem['power'] : null,
-            'energy_wh' => isset($pzem['energy_wh']) ? (float) $pzem['energy_wh'] : null,
-            'wind_speed' => isset($wind['speed_ms']) ? (float) $wind['speed_ms'] : null,
-            'pitch_elev' => isset($imu['pitch_elev']) ? (float) $imu['pitch_elev'] : null,
-            'azimuth' => isset($imu['azimuth']) ? (float) $imu['azimuth'] : null,
-            'roll' => isset($imu['roll']) ? (float) $imu['roll'] : null,
-            'cal_sys' => isset($imu['cal_sys']) ? (int) $imu['cal_sys'] : null,
-            'cal_gyro' => isset($imu['cal_gyro']) ? (int) $imu['cal_gyro'] : null,
-            'cal_accel' => isset($imu['cal_accel']) ? (int) $imu['cal_accel'] : null,
-            'cal_mag' => isset($imu['cal_mag']) ? (int) $imu['cal_mag'] : null,
-            'target_elev' => isset($target['elev']) ? (float) $target['elev'] : null,
-            'target_az' => isset($target['az']) ? (float) $target['az'] : null,
-            'elev_state' => $actuators['elev_state'] ?? null,
-            'az_state' => $actuators['az_state'] ?? null,
-            'elev_current' => isset($actuators['elev_current']) ? (float) $actuators['elev_current'] : null,
-            'az_current' => isset($actuators['az_current']) ? (float) $actuators['az_current'] : null,
-            'latitude' => isset($gps['lat']) ? (float) $gps['lat'] : null,
-            'longitude' => isset($gps['lon']) ? (float) $gps['lon'] : null,
-            'altitude' => isset($gps['alt']) ? (float) $gps['alt'] : null,
-            'satellites' => isset($gps['satellites']) ? (int) $gps['satellites'] : null,
-            'fix' => ! empty($gps['fix']),
-            'hdop' => isset($gps['hdop']) ? (float) $gps['hdop'] : null,
-            'temp_c' => isset($rtc['temp_c']) ? (float) $rtc['temp_c'] : null,
-            'drift_s' => isset($rtc['drift_s']) ? (int) $rtc['drift_s'] : null,
-            'flags' => $flags,
-            'raw_payload' => $payload,
-        ]);
-
-        // Update device real-time state
-        $device->update([
-            'last_seen_at' => $receivedAt,
-            'status' => 'online',
-            'firmware' => $payload['firmware'] ?? $device->firmware,
-            'rssi' => $payload['rssi'] ?? $device->rssi,
-            'mode' => $payload['mode'] ?? $device->mode,
-        ]);
-
-        // Real-time Safety Alert Checks
-        $this->evaluateTelemetryAlerts($device, $payload);
+        $payload['uid'] = $payload['uid'] ?? $uid;
+        $telemetry = (new ProcessTelemetry($payload))->handle();
 
         $this->line(sprintf(
             '[%s] Telemetry %s: Mode=%s Elev=%.1f° Az=%.1f° Pwr=%.1fW Wind=%.1fm/s',
-            $receivedAt->toTimeString(),
+            $telemetry->received_at?->toTimeString() ?? Carbon::now()->toTimeString(),
             $uid,
-            $payload['mode'] ?? 'auto',
-            $imu['pitch_elev'] ?? 0.0,
-            $imu['azimuth'] ?? 0.0,
-            $pzem['power'] ?? 0.0,
-            $wind['speed_ms'] ?? 0.0
+            $telemetry->mode ?? 'auto',
+            $telemetry->pitch_elev ?? 0.0,
+            $telemetry->azimuth ?? 0.0,
+            $telemetry->pzem_power ?? $telemetry->power ?? 0.0,
+            $telemetry->wind_speed_ms ?? $telemetry->wind_speed ?? 0.0
         ));
     }
 
@@ -283,6 +199,9 @@ class MqttListenCommand extends Command
         if (! is_array($payload)) {
             return;
         }
+
+        $payload['uid'] = $payload['uid'] ?? $uid;
+        (new ProcessStatus($payload))->handle();
 
         $status = $payload['status'] ?? 'offline';
 
@@ -356,6 +275,9 @@ class MqttListenCommand extends Command
         if (! is_array($payload) || empty($payload['cmd_id'])) {
             return;
         }
+
+        $payload['uid'] = $payload['uid'] ?? $uid;
+        (new ProcessAck($payload))->handle();
 
         $cmdId = $payload['cmd_id'];
         $status = $payload['status'] ?? 'accepted';
