@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Lang;
 
 class Alert extends Model
 {
@@ -52,17 +53,48 @@ class Alert extends Model
      */
     public function renderMessage(): string
     {
-        $codeKey = 'alerts.' . $this->code;
-        if (\Illuminate\Support\Facades\Lang::has($codeKey)) {
-            return __($codeKey, $this->metadata ?? []);
+        try {
+            $codeKey = 'alerts.'.$this->code;
+            if (Lang::has($codeKey)) {
+                return (string) __($codeKey, $this->sanitizeReplacements($this->metadata));
+            }
+
+            $jsonKey = (string) __($this->code);
+            if ($jsonKey !== $this->code) {
+                return $jsonKey;
+            }
+
+            return (string) __($this->message);
+        } catch (\Throwable) {
+            return (string) ($this->message ?: $this->code);
+        }
+    }
+
+    /**
+     * Sanitize metadata into scalar key-value pairs suitable for translation replacements.
+     *
+     * @return array<string, string>
+     */
+    protected function sanitizeReplacements(mixed $metadata): array
+    {
+        if (! is_array($metadata)) {
+            return [];
         }
 
-        $jsonKey = __($this->code);
-        if ($jsonKey !== $this->code) {
-            return $jsonKey;
+        $replacements = [];
+        foreach ($metadata as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                $replacements[$key] = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '';
+            } elseif (is_bool($value)) {
+                $replacements[$key] = $value ? 'true' : 'false';
+            } elseif (is_scalar($value)) {
+                $replacements[$key] = (string) $value;
+            } else {
+                $replacements[$key] = '';
+            }
         }
 
-        return __($this->message);
+        return $replacements;
     }
 
     /**
