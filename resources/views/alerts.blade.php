@@ -1,114 +1,114 @@
-<x-layouts.app title="{{ __('Alerts & Diagnostics') }}">
+<x-layouts.app :title="__('Peringatan')">
     <x-page-header 
         :title="__('Alerts & Diagnostics')" 
-        :subtitle="__('Real-time condition evaluation, hardware safety interlocks, and sensor health diagnostics.')"
+        :subtitle="__('Evaluasi kondisi real-time, interlock keselamatan perangkat keras, dan diagnostik sensor.')"
         :badge="__('SCADA Interlocks')"
     >
         <x-slot:actions>
             <div class="flex items-center space-x-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                    {{ __('Engine Active (Auto-Resolve Hysteresis)') }}
+                <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-mono font-medium border border-ok/30 text-ok bg-ok/10">
+                    <span class="w-1.5 h-1.5 rounded-full bg-ok mr-1.5 animate-pulse"></span>
+                    {{ __('ENGINE AKTIF (Histeresis Auto-Resolve)') }}
                 </span>
             </div>
         </x-slot:actions>
     </x-page-header>
 
     @if(session('success'))
-        <div class="mb-5 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
+        <div class="mb-5 p-3 rounded-md bg-ok/10 border border-ok/30 text-ok text-sm flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 <span>{{ session('success') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 cursor-pointer text-base">&times;</button>
+            <button onclick="this.parentElement.remove()" class="text-ok hover:opacity-75 cursor-pointer">&times;</button>
         </div>
     @endif
 
     {{-- Toast feedback container --}}
-    <div id="alertToast" class="hidden mb-5 p-4 rounded-xl text-sm flex items-center justify-between transition-all">
+    <div id="alertToast" class="hidden mb-5 p-3 rounded-md text-sm flex items-center justify-between border transition-all">
         <div class="flex items-center space-x-2" id="alertToastContent"></div>
-        <button onclick="document.getElementById('alertToast').classList.add('hidden')" class="text-slate-500 hover:text-slate-800 cursor-pointer text-base">&times;</button>
+        <button onclick="document.getElementById('alertToast').classList.add('hidden')" class="text-muted hover:text-ink cursor-pointer">&times;</button>
     </div>
 
     {{-- KPI Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <x-kpi-card 
-            :title="__('Active Alerts')" 
+            :title="__('Peringatan Aktif')" 
             :value="$kpis['active_total']" 
-            badge="ACTIVE" 
-            :badgeType="$kpis['active_total'] > 0 ? 'warning' : 'neutral'"
-            :subtitle="__('Open or acknowledged')"
+            :tone="$kpis['active_total'] > 0 ? 'warn' : 'default'"
+            :badge="$kpis['active_total'] > 0 ? 'AKTIF' : 'NOMINAL'"
+            :subtitle="__('Terbuka atau dalam penanganan')"
         />
 
         <x-kpi-card 
-            :title="__('Critical Priority')" 
+            :title="__('Prioritas Kritis')" 
             :value="$kpis['critical_open']" 
-            badge="CRITICAL" 
-            :badgeType="$kpis['critical_open'] > 0 ? 'danger' : 'neutral'"
-            :subtitle="__('Protective stow / actuator stops')"
+            :tone="$kpis['critical_open'] > 0 ? 'danger' : 'default'"
+            :badge="$kpis['critical_open'] > 0 ? 'KRITIS' : 'AMAN'"
+            :subtitle="__('Proteksi stow / aktuator henti')"
         />
 
         <x-kpi-card 
-            :title="__('Warnings')" 
+            :title="__('Peringatan Terbuka')" 
             :value="$kpis['warning_open']" 
-            badge="WARNING" 
-            :badgeType="$kpis['warning_open'] > 0 ? 'warning' : 'neutral'"
-            :subtitle="__('IMU uncal, comms, RTC drift')"
+            :tone="$kpis['warning_open'] > 0 ? 'warn' : 'default'"
+            :badge="$kpis['warning_open'] > 0 ? 'PERINGATAN' : 'NORMAL'"
+            :subtitle="__('IMU, komunikasi, drift RTC')"
         />
 
         <x-kpi-card 
-            :title="__('Resolved (24h)')" 
+            :title="__('Selesai (24 Jam)')" 
             :value="$kpis['resolved_24h']" 
-            badge="RESOLVED" 
-            badgeType="success"
-            :subtitle="__('Cleared automatically or by staff')"
+            tone="ok"
+            badge="TERATASI"
+            :subtitle="__('Otomatis atau oleh operator')"
         />
     </div>
 
     {{-- Filter Toolbar --}}
-    <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5 mb-6">
+    <div class="bg-panel border border-line rounded-md p-4 mb-6">
         <form method="GET" action="{{ route('alerts') }}" class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {{-- Status Tabs --}}
-            <div class="flex items-center space-x-1 p-1 bg-slate-100 rounded-lg text-sm font-medium">
+            <div class="flex items-center space-x-1 overflow-x-auto">
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}" 
-                   class="px-3.5 py-2 rounded-md transition-colors {{ ($filters['status'] ?? 'all') === 'all' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900' }}">
-                    {{ __('All') }}
+                   class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {{ ($filters['status'] ?? 'all') === 'all' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}">
+                    {{ __('Semua') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'active'])) }}" 
-                   class="px-3.5 py-2 rounded-md transition-colors {{ ($filters['status'] ?? '') === 'active' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900' }}">
-                    {{ __('Active') }}
+                   class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {{ ($filters['status'] ?? '') === 'active' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}">
+                    {{ __('Aktif') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'open'])) }}" 
-                   class="px-3.5 py-2 rounded-md transition-colors {{ ($filters['status'] ?? '') === 'open' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900' }}">
-                    {{ __('Open') }}
+                   class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {{ ($filters['status'] ?? '') === 'open' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}">
+                    {{ __('Terbuka') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'acknowledged'])) }}" 
-                   class="px-3.5 py-2 rounded-md transition-colors {{ ($filters['status'] ?? '') === 'acknowledged' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900' }}">
-                    {{ __('Ack\'ed') }}
+                   class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {{ ($filters['status'] ?? '') === 'acknowledged' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}">
+                    {{ __('Diakui') }}
                 </a>
                 <a href="{{ route('alerts', array_merge(request()->except('status', 'page'), ['status' => 'resolved'])) }}" 
-                   class="px-3.5 py-2 rounded-md transition-colors {{ ($filters['status'] ?? '') === 'resolved' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900' }}">
-                    {{ __('Resolved') }}
+                   class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {{ ($filters['status'] ?? '') === 'resolved' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}">
+                    {{ __('Selesai') }}
                 </a>
             </div>
 
             {{-- Severity, Device, and Search Controls --}}
-            <div class="flex flex-wrap items-center gap-3 text-sm">
+            <div class="flex flex-wrap items-center gap-2">
                 <input type="hidden" name="status" value="{{ $filters['status'] ?? 'all' }}">
 
                 {{-- Severity Filter --}}
-                <select name="severity" onchange="this.form.submit()" class="h-11 min-h-[44px] px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <option value="all" {{ ($filters['severity'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('All Severities') }}</option>
-                    <option value="critical" {{ ($filters['severity'] ?? '') === 'critical' ? 'selected' : '' }}>{{ __('Critical Only') }}</option>
-                    <option value="warning" {{ ($filters['severity'] ?? '') === 'warning' ? 'selected' : '' }}>{{ __('Warning Only') }}</option>
-                    <option value="info" {{ ($filters['severity'] ?? '') === 'info' ? 'selected' : '' }}>{{ __('Info Only') }}</option>
+                <select name="severity" onchange="this.form.submit()" class="h-9 px-2.5 py-1 bg-bg border border-line rounded-md text-ink text-xs font-medium focus:outline-none focus:border-accent">
+                    <option value="all" {{ ($filters['severity'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('Semua Tingkat') }}</option>
+                    <option value="critical" {{ ($filters['severity'] ?? '') === 'critical' ? 'selected' : '' }}>{{ __('Hanya Kritis') }}</option>
+                    <option value="warning" {{ ($filters['severity'] ?? '') === 'warning' ? 'selected' : '' }}>{{ __('Hanya Peringatan') }}</option>
+                    <option value="info" {{ ($filters['severity'] ?? '') === 'info' ? 'selected' : '' }}>{{ __('Hanya Info') }}</option>
                 </select>
 
                 {{-- Device Filter --}}
-                <select name="device_id" onchange="this.form.submit()" class="h-11 min-h-[44px] px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <option value="all" {{ ($filters['device_id'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('All Tracker Nodes') }}</option>
+                <select name="device_id" onchange="this.form.submit()" class="h-9 px-2.5 py-1 bg-bg border border-line rounded-md text-ink text-xs font-medium focus:outline-none focus:border-accent">
+                    <option value="all" {{ ($filters['device_id'] ?? 'all') === 'all' ? 'selected' : '' }}>{{ __('Semua Node Tracker') }}</option>
                     @foreach($devices as $dev)
                         <option value="{{ $dev->id }}" {{ (string)($filters['device_id'] ?? '') === (string)$dev->id ? 'selected' : '' }}>
                             {{ $dev->uid }} ({{ $dev->name }})
@@ -118,19 +118,19 @@
 
                 {{-- Text Search --}}
                 <div class="relative">
-                    <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Search code, message...') }}" 
-                           class="w-56 h-11 min-h-[44px] pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Cari kode, pesan...') }}" 
+                           class="w-48 h-9 pl-8 pr-3 py-1 bg-bg border border-line rounded-md text-ink placeholder-muted focus:outline-none focus:border-accent text-xs">
+                    <svg class="w-3.5 h-3.5 text-muted absolute left-2.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
 
-                <button type="submit" class="h-11 min-h-[44px] px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg transition-colors cursor-pointer">
+                <button type="submit" class="h-9 px-3 py-1 bg-accent hover:bg-blue-600 text-ink text-xs font-medium rounded-md transition-colors cursor-pointer">
                     {{ __('Filter') }}
                 </button>
 
                 @if(!empty($filters['q']) || ($filters['severity'] ?? 'all') !== 'all' || ($filters['device_id'] ?? 'all') !== 'all' || ($filters['status'] ?? 'all') !== 'all')
-                    <a href="{{ route('alerts') }}" class="px-3 py-2 text-slate-500 hover:text-slate-800 underline font-medium text-sm">
+                    <a href="{{ route('alerts') }}" class="h-9 px-2.5 py-1 border border-line text-muted hover:text-ink text-xs rounded-md transition-colors flex items-center">
                         {{ __('Reset') }}
                     </a>
                 @endif
@@ -138,58 +138,72 @@
         </form>
     </div>
 
-    {{-- Alerts Table Card --}}
-    <x-card :title="__('System Alerts Log')" :subtitle="__('Comprehensive history of SCADA interlocks, hardware faults, and condition transitions.')">
-        <div class="overflow-x-auto -mx-6 -my-6">
-            <table class="w-full text-left text-sm border-collapse">
-                <thead>
-                    <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                        <th class="py-4 px-5">{{ __('Severity') }}</th>
-                        <th class="py-4 px-5">{{ __('Alert Code & Message') }}</th>
-                        <th class="py-4 px-5">{{ __('Tracker Node') }}</th>
-                        <th class="py-4 px-5">{{ __('Triggered Time (WIB)') }}</th>
-                        <th class="py-4 px-5">{{ __('Status') }}</th>
-                        <th class="py-4 px-5 text-right">{{ __('Actions') }}</th>
+    {{-- Alerts Table Panel --}}
+    <div class="bg-panel border border-line rounded-md overflow-hidden mb-6">
+        <div class="p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+                <h3 class="text-sm font-semibold text-ink">{{ __('Log Peringatan Sistem') }}</h3>
+                <p class="text-xs text-muted mt-0.5">{{ __('Riwayat lengkap SCADA interlock, kendala perangkat keras, dan transisi kondisi.') }}</p>
+            </div>
+            <div class="text-xs font-mono text-muted">
+                {{ __('Halaman :current dari :total (:count total peringatan)', [
+                    'current' => $alerts->currentPage(),
+                    'total' => $alerts->lastPage(),
+                    'count' => $alerts->total()
+                ]) }}
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-bg/40 text-muted uppercase text-xs tracking-wider border-b border-line">
+                    <tr>
+                        <th class="py-2.5 px-4 font-medium">{{ __('Tingkat') }}</th>
+                        <th class="py-2.5 px-4 font-medium">{{ __('Kode & Pesan') }}</th>
+                        <th class="py-2.5 px-4 font-medium">{{ __('Node Perangkat') }}</th>
+                        <th class="py-2.5 px-4 font-medium">{{ __('Waktu Terpicu') }}</th>
+                        <th class="py-2.5 px-4 font-medium">{{ __('Status') }}</th>
+                        <th class="py-2.5 px-4 font-medium text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100" id="alertsTableBody">
+                <tbody class="divide-y divide-line" id="alertsTableBody">
                     @forelse($alerts as $alert)
-                        <tr class="hover:bg-slate-50/60 transition-colors" id="alert-row-{{ $alert->id }}">
-                            {{-- Severity Badge --}}
-                            <td class="py-4 px-5 align-top whitespace-nowrap">
+                        <tr class="hover:bg-line/20 transition-colors" id="alert-row-{{ $alert->id }}">
+                            {{-- Severity Badge (dot + text) --}}
+                            <td class="py-3 px-4 align-top whitespace-nowrap">
                                 @if($alert->severity === 'critical')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                        <span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5 {{ $alert->status === 'open' ? 'animate-ping' : '' }}"></span>
-                                        {{ __('CRITICAL') }}
+                                    <span class="inline-flex items-center space-x-1.5 text-danger font-mono text-xs">
+                                        <span class="w-2 h-2 rounded-full bg-danger {{ $alert->status === 'open' ? 'animate-pulse' : '' }}"></span>
+                                        <span>KRITIS</span>
                                     </span>
                                 @elseif($alert->severity === 'warning')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>
-                                        {{ __('WARNING') }}
+                                    <span class="inline-flex items-center space-x-1.5 text-warn font-mono text-xs">
+                                        <span class="w-2 h-2 rounded-full bg-warn"></span>
+                                        <span>PERINGATAN</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                        <span class="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span>
-                                        {{ __('INFO') }}
+                                    <span class="inline-flex items-center space-x-1.5 text-accent font-mono text-xs">
+                                        <span class="w-2 h-2 rounded-full bg-accent"></span>
+                                        <span>INFO</span>
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- Code & Message (Render translated message at render time) --}}
-                            <td class="py-4 px-5 align-top">
+                            {{-- Code & Message --}}
+                            <td class="py-3 px-4 align-top">
                                 <div class="flex items-center space-x-2">
-                                    <span class="font-mono font-bold text-slate-800 text-xs tracking-tight bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                    <span class="font-mono text-xs text-ink px-1.5 py-0.5 rounded border border-line bg-bg">
                                         {{ $alert->code }}
                                     </span>
                                 </div>
-                                <div class="text-slate-700 text-sm mt-1 leading-snug">
+                                <div class="text-ink text-sm mt-1 leading-snug">
                                     {{ $alert->display_message }}
                                 </div>
                                 @if(!empty($alert->metadata))
                                     <div class="flex flex-wrap gap-1 mt-1.5">
                                         @foreach($alert->metadata as $mKey => $mVal)
                                             @if(is_scalar($mVal))
-                                                <span class="inline-flex items-center text-xs bg-slate-50 text-slate-500 border border-slate-200 px-1.5 py-0.5 rounded font-mono">
+                                                <span class="inline-flex items-center text-[11px] bg-bg text-muted border border-line px-1.5 py-0.5 rounded font-mono">
                                                     {{ $mKey }}: {{ is_bool($mVal) ? ($mVal ? 'true' : 'false') : $mVal }}
                                                 </span>
                                             @endif
@@ -199,48 +213,51 @@
                             </td>
 
                             {{-- Device & Site --}}
-                            <td class="py-4 px-5 align-top whitespace-nowrap">
-                                <div class="font-semibold text-slate-800">
-                                    <a href="{{ route('solar-tracker', ['uid' => $alert->device?->uid]) }}" class="hover:text-blue-600 hover:underline">
+                            <td class="py-3 px-4 align-top whitespace-nowrap">
+                                <div class="font-medium text-ink">
+                                    <a href="{{ route('solar-tracker', ['uid' => $alert->device?->uid]) }}" class="hover:text-accent transition-colors">
                                         {{ $alert->device?->uid ?? 'N/A' }}
                                     </a>
                                 </div>
-                                <div class="text-xs text-slate-400 mt-0.5">
+                                <div class="text-xs text-muted mt-0.5">
                                     {{ $alert->device?->site?->name ?? 'Default Site' }}
                                 </div>
                             </td>
 
-                            {{-- Time (Indonesian format with WIB) --}}
-                            <td class="py-4 px-5 align-top whitespace-nowrap">
-                                <div class="font-medium text-slate-700">
-                                    {{ formatDateWib($alert->opened_at, 'd F Y, H.i') }}
+                            {{-- Time --}}
+                            <td class="py-3 px-4 align-top whitespace-nowrap font-mono text-xs">
+                                <div class="text-ink">
+                                    {{ formatDateWib($alert->opened_at, 'd M Y, H:i') }}
                                 </div>
-                                <div class="text-xs text-slate-400 mt-0.5">
+                                <div class="text-muted mt-0.5">
                                     {{ $alert->opened_at?->diffForHumans() }}
                                 </div>
                             </td>
 
-                            {{-- Status Badge --}}
-                            <td class="py-4 px-5 align-top whitespace-nowrap" id="status-cell-{{ $alert->id }}">
+                            {{-- Status Cell --}}
+                            <td class="py-3 px-4 align-top whitespace-nowrap" id="status-cell-{{ $alert->id }}">
                                 @if($alert->status === 'open')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                        {{ __('Open') }}
+                                    <span class="inline-flex items-center space-x-1.5 text-danger font-mono text-xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-danger"></span>
+                                        <span>Terbuka</span>
                                     </span>
                                 @elseif($alert->status === 'acknowledged')
                                     <div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                                            {{ __('Acknowledged') }}
+                                        <span class="inline-flex items-center space-x-1.5 text-purple-400 font-mono text-xs">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                                            <span>Diakui</span>
                                         </span>
-                                        <div class="text-xs text-slate-400 mt-0.5">
-                                            {{ __('by :name', ['name' => $alert->acknowledgedBy?->name ?? 'Operator']) }}
+                                        <div class="text-xs text-muted mt-0.5">
+                                            {{ __('oleh :name', ['name' => $alert->acknowledgedBy?->name ?? 'Operator']) }}
                                         </div>
                                     </div>
                                 @else
                                     <div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            {{ __('Resolved') }}
+                                        <span class="inline-flex items-center space-x-1.5 text-ok font-mono text-xs">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-ok"></span>
+                                            <span>Selesai</span>
                                         </span>
-                                        <div class="text-xs text-slate-400 mt-0.5 font-mono">
+                                        <div class="text-xs text-muted mt-0.5 font-mono">
                                             {{ formatTimeWib($alert->resolved_at) }}
                                         </div>
                                     </div>
@@ -248,13 +265,13 @@
                             </td>
 
                             {{-- Actions --}}
-                            <td class="py-4 px-5 align-top text-right whitespace-nowrap" id="action-cell-{{ $alert->id }}">
+                            <td class="py-3 px-4 align-top text-right whitespace-nowrap" id="action-cell-{{ $alert->id }}">
                                 @if(auth()->user()->canControl())
-                                    <div class="inline-flex items-center space-x-2">
+                                    <div class="inline-flex items-center space-x-1.5">
                                         @if($alert->status === 'open')
                                             <button type="button" 
                                                     onclick="handleAlertAction('acknowledge', {{ $alert->id }})"
-                                                    class="h-10 min-h-[40px] px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                                                    class="h-8 px-2.5 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded text-xs font-medium transition-colors cursor-pointer">
                                                 {{ __('Acknowledge') }}
                                             </button>
                                         @endif
@@ -262,37 +279,29 @@
                                         @if($alert->status !== 'resolved')
                                             <button type="button" 
                                                     onclick="handleAlertAction('resolve', {{ $alert->id }})"
-                                                    class="h-10 min-h-[40px] px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                                                    class="h-8 px-2.5 py-1 bg-ok/10 hover:bg-ok/20 text-ok border border-ok/40 rounded text-xs font-medium transition-colors cursor-pointer">
                                                 {{ __('Resolve') }}
                                             </button>
                                         @else
-                                            <span class="text-xs text-slate-400 font-medium inline-flex items-center">
-                                                <svg class="w-4 h-4 text-emerald-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                {{ __('Closed') }}
+                                            <span class="text-xs text-muted font-mono inline-flex items-center">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-ok mr-1"></span>
+                                                {{ __('Selesai') }}
                                             </span>
                                         @endif
                                     </div>
                                 @else
-                                    <span class="inline-flex items-center text-xs text-slate-400 italic">
-                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                        {{ __('Read-only') }}
+                                    <span class="inline-flex items-center text-xs text-muted font-mono italic">
+                                        {{ __('Hanya Baca') }}
                                     </span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-10 text-center bg-slate-50/50">
-                                <svg class="w-12 h-12 text-emerald-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div class="text-base font-semibold text-slate-700">{{ __('All Systems Nominal') }}</div>
-                                <div class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-                                    {{ __('No alerts matching the selected filter criteria. Hardware interlocks are idle.') }}
+                            <td colspan="6" class="p-8 text-center text-muted">
+                                <div class="text-sm font-medium text-ink">{{ __('Semua Sistem Normal') }}</div>
+                                <div class="text-xs text-muted mt-1 max-w-sm mx-auto">
+                                    {{ __('Tidak ada peringatan aktif yang sesuai filter. Seluruh interlock aman.') }}
                                 </div>
                             </td>
                         </tr>
@@ -302,18 +311,11 @@
         </div>
 
         @if($alerts->hasPages())
-            <x-slot:footer>
-                <div class="flex items-center justify-between">
-                    <div>
-                        {{ __('Showing :from to :to of :total alerts', ['from' => $alerts->firstItem(), 'to' => $alerts->lastItem(), 'total' => $alerts->total()]) }}
-                    </div>
-                    <div>
-                        {{ $alerts->links() }}
-                    </div>
-                </div>
-            </x-slot:footer>
+            <div class="p-3 border-t border-line bg-bg/40">
+                {{ $alerts->links() }}
+            </div>
         @endif
-    </x-card>
+    </div>
 
     @push('scripts')
     <script>
@@ -340,11 +342,11 @@
                     showToast(data.message, 'success');
                     updateRowVisuals(alertId, action, data);
                 } else {
-                    showToast(data.message || (window.__ ? window.__('Action failed.') : 'Action failed.'), 'danger');
+                    showToast(data.message || 'Gagal memproses aksi peringatan.', 'danger');
                 }
             } catch (err) {
                 console.error(err);
-                showToast(window.__ ? window.__('Network error while processing alert action.') : 'Network error while processing alert action.', 'danger');
+                showToast('Terjadi kendala jaringan saat memproses peringatan.', 'danger');
             }
         }
 
@@ -352,31 +354,27 @@
             const statusCell = document.getElementById(`status-cell-${alertId}`);
             const actionCell = document.getElementById(`action-cell-${alertId}`);
 
-            const ackLabel = window.__ ? window.__('Acknowledged') : 'Acknowledged';
-            const resLabel = window.__ ? window.__('Resolved') : 'Resolved';
-            const closedLabel = window.__ ? window.__('Closed') : 'Closed';
-            const resolveBtnText = window.__ ? window.__('Resolve') : 'Resolve';
-
             if (action === 'acknowledge') {
                 if (statusCell) {
                     statusCell.innerHTML = `
                         <div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                                ${ackLabel}
+                            <span class="inline-flex items-center space-x-1.5 text-purple-400 font-mono text-xs">
+                                <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                                <span>Diakui</span>
                             </span>
-                            <div class="text-xs text-slate-400 mt-0.5">
-                                ${data.acknowledged_by || 'Operator'}
+                            <div class="text-xs text-muted mt-0.5">
+                                oleh ${data.acknowledged_by || 'Operator'}
                             </div>
                         </div>
                     `;
                 }
                 if (actionCell) {
                     actionCell.innerHTML = `
-                        <div class="inline-flex items-center space-x-2">
+                        <div class="inline-flex items-center space-x-1.5">
                             <button type="button" 
                                     onclick="handleAlertAction('resolve', ${alertId})"
-                                    class="h-10 min-h-[40px] px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
-                                ${resolveBtnText}
+                                    class="h-8 px-2.5 py-1 bg-ok/10 hover:bg-ok/20 text-ok border border-ok/40 rounded text-xs font-medium transition-colors cursor-pointer">
+                                Resolve
                             </button>
                         </div>
                     `;
@@ -385,10 +383,11 @@
                 if (statusCell) {
                     statusCell.innerHTML = `
                         <div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                ${resLabel}
+                            <span class="inline-flex items-center space-x-1.5 text-ok font-mono text-xs">
+                                <span class="w-1.5 h-1.5 rounded-full bg-ok"></span>
+                                <span>Selesai</span>
                             </span>
-                            <div class="text-xs text-slate-400 mt-0.5 font-mono">
+                            <div class="text-xs text-muted mt-0.5 font-mono">
                                 ${data.resolved_at || 'WIB'}
                             </div>
                         </div>
@@ -396,11 +395,9 @@
                 }
                 if (actionCell) {
                     actionCell.innerHTML = `
-                        <span class="text-xs text-slate-400 font-medium inline-flex items-center">
-                            <svg class="w-4 h-4 text-emerald-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            ${closedLabel}
+                        <span class="text-xs text-muted font-mono inline-flex items-center">
+                            <span class="w-1.5 h-1.5 rounded-full bg-ok mr-1"></span>
+                            Selesai
                         </span>
                     `;
                 }
@@ -412,14 +409,14 @@
             const content = document.getElementById('alertToastContent');
             if (!toast || !content) return;
 
-            toast.className = `mb-5 p-4 rounded-xl text-sm flex items-center justify-between border ${
+            toast.className = `mb-5 p-3 rounded-md text-sm flex items-center justify-between border ${
                 type === 'success' 
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                    ? 'bg-ok/10 border-ok/30 text-ok' 
+                    : 'bg-danger/10 border-danger/30 text-danger'
             }`;
 
             content.innerHTML = `
-                <svg class="w-5 h-5 ${type === 'success' ? 'text-emerald-600' : 'text-rose-600'} shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M5 13l4 4L19 7' : 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'}" />
                 </svg>
                 <span>${message}</span>
