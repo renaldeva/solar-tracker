@@ -141,14 +141,46 @@ window.themeManager.init();
 // Alpine component for theme dropdown
 window.themeDropdown = function () {
     return {
-        get open() { return window.themeManager.open; },
-        set open(val) { window.themeManager.open = val; },
-        get theme() { return window.themeManager.theme; },
-        get isDark() { return window.themeManager.isDark; },
+        open: false,
+        theme: window.themeManager ? window.themeManager.theme : 'system',
+        isDark: window.themeManager ? window.themeManager.isDark : false,
+        init() {
+            if (window.themeManager) {
+                this.theme = window.themeManager.theme;
+                this.isDark = window.themeManager.isDark;
+            }
+            window.addEventListener('theme-changed', (e) => {
+                this.theme = e.detail.theme;
+                this.isDark = e.detail.isDark;
+            });
+        },
+        toggle() {
+            this.open = !this.open;
+        },
         setTheme(val) {
-            window.themeManager.setTheme(val);
+            this.theme = val;
+            if (window.themeManager) {
+                window.themeManager.setTheme(val);
+                this.isDark = window.themeManager.isDark;
+            }
+            this.open = false;
         }
     };
+};
+
+Alpine.data('themeDropdown', window.themeDropdown);
+
+// Global convenience helpers for direct console/shortcut switching
+window.setTheme = function (val) {
+    if (window.themeManager) {
+        window.themeManager.setTheme(val);
+    }
+};
+
+window.toggleTheme = function () {
+    if (window.themeManager) {
+        window.themeManager.setTheme(window.themeManager.isDark ? 'light' : 'dark');
+    }
 };
 
 Alpine.start();

@@ -59,7 +59,7 @@
             <!-- Theme Switcher Dropdown (Terang, Gelap, Otomatis) -->
             <div x-data="themeDropdown()" class="relative">
                 <button 
-                    @click="open = !open" 
+                    @click.stop="open = !open" 
                     type="button" 
                     aria-label="Ganti tema"
                     title="{{ __('Ganti tema') }}"
