@@ -23,7 +23,7 @@
                 <line x1="140" y1="125" x2="146" y2="105" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round" />
 
                 <!-- Rotating Collector PV Panel Assembly -->
-                <g transform="rotate(-{{ $elevCurrent }}, 150, 110)" class="transition-transform duration-700 ease-out">
+                <g transform="rotate({{ -1 * (float) $elevCurrent }}, 150, 110)" class="transition-transform duration-700 ease-out">
                     <!-- Collector Plane (Solar Array) -->
                     <line x1="60" y1="110" x2="240" y2="110" stroke="#2563eb" stroke-width="7" stroke-linecap="round" />
                     <line x1="65" y1="107" x2="235" y2="107" stroke="#bfdbfe" stroke-width="2" stroke-linecap="round" />
@@ -44,7 +44,7 @@
                 <circle cx="150" cy="110" r="5" fill="#ffffff" stroke="#2563eb" stroke-width="3" />
 
                 <!-- Target Elevation Reference Line -->
-                <g transform="rotate(-{{ $elevTarget }}, 150, 110)">
+                <g transform="rotate({{ -1 * (float) $elevTarget }}, 150, 110)">
                     <line x1="60" y1="110" x2="240" y2="110" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3" opacity="0.9" />
                 </g>
             </svg>

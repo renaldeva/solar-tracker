@@ -203,17 +203,27 @@ class TrackerCommandService
             'expires_at' => $command->expires_at->toIso8601String(),
         ]);
 
-        $host = config('mqtt-client.connections.default.host') ?: 'mosquitto';
-        $port = (int) (config('mqtt-client.connections.default.port') ?: 1883);
+        $host = config('mqtt-client.connections.default.host') ?: env('MQTT_HOST', 'mosquitto');
+        $port = (int) (config('mqtt-client.connections.default.port') ?: env('MQTT_PORT', 1883));
         $clientId = 'backend_cmd_'.substr(md5(uniqid('', true)), 0, 8);
+
+        $authUsername = config('mqtt-client.connections.default.connection_settings.auth.username')
+            ?? env('MQTT_AUTH_USERNAME', 'solar_backend');
+        $authPassword = config('mqtt-client.connections.default.connection_settings.auth.password')
+            ?? env('MQTT_AUTH_PASSWORD', 'BackendSecret123!');
 
         try {
             $mqtt = new MqttClient($host, $port, $clientId);
             $settings = (new ConnectionSettings)
-                ->setUsername('solar_backend')
-                ->setPassword('BackendSecret123!')
                 ->setConnectTimeout(2)
                 ->setSocketTimeout(3);
+
+            if (! empty($authUsername)) {
+                $settings->setUsername((string) $authUsername);
+                if (! empty($authPassword)) {
+                    $settings->setPassword((string) $authPassword);
+                }
+            }
 
             $mqtt->connect($settings, true);
             $topic = "tracker/{$device->uid}/cmd";
