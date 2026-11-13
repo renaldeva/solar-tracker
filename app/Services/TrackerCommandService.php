@@ -203,20 +203,24 @@ class TrackerCommandService
             'expires_at' => $command->expires_at->toIso8601String(),
         ]);
 
-        $host = config('mqtt-client.connections.default.host') ?: env('MQTT_HOST', 'mosquitto');
-        $port = (int) (config('mqtt-client.connections.default.port') ?: env('MQTT_PORT', 1883));
+        $host = config('mqtt.host') ?? config('mqtt-client.connections.default.host') ?? env('MQTT_HOST', '10.132.15.43');
+        $port = (int) (config('mqtt.port') ?? config('mqtt-client.connections.default.port') ?? env('MQTT_PORT', 1884));
         $clientId = 'backend_cmd_'.substr(md5(uniqid('', true)), 0, 8);
 
-        $authUsername = config('mqtt-client.connections.default.connection_settings.auth.username')
-            ?? env('MQTT_AUTH_USERNAME', 'solar_backend');
-        $authPassword = config('mqtt-client.connections.default.connection_settings.auth.password')
-            ?? env('MQTT_AUTH_PASSWORD', 'BackendSecret123!');
+        $authUsername = config('mqtt.username')
+            ?? config('mqtt-client.connections.default.connection_settings.auth.username')
+            ?? env('MQTT_USERNAME')
+            ?? env('MQTT_AUTH_USERNAME', 'device_ST-DEMO-001');
+        $authPassword = config('mqtt.password')
+            ?? config('mqtt-client.connections.default.connection_settings.auth.password')
+            ?? env('MQTT_PASSWORD')
+            ?? env('MQTT_AUTH_PASSWORD', 'LHm8PSGX0wff9CkZ');
 
         try {
             $mqtt = new MqttClient($host, $port, $clientId);
             $settings = (new ConnectionSettings)
-                ->setConnectTimeout(2)
-                ->setSocketTimeout(3);
+                ->setConnectTimeout(5)
+                ->setSocketTimeout(5);
 
             if (! empty($authUsername)) {
                 $settings->setUsername((string) $authUsername);
