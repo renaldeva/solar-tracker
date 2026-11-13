@@ -3,22 +3,66 @@
 namespace Tests\Unit;
 
 use App\Models\Alert;
+use Illuminate\Support\Facades\Lang;
 use Tests\TestCase;
 
 class AlertMessageTest extends TestCase
 {
+    /**
+     * Test alert message rendering for DEVICE_OFFLINE with metadata.
+     */
+    public function test_alert_render_message_device_offline(): void
+    {
+        $alert = new Alert([
+            'code' => 'DEVICE_OFFLINE',
+            'message' => 'Device ST-DEMO-001 connection lost (broker LWT or timeout)',
+            'metadata' => [
+                'status' => 'offline',
+                'reason' => 'lwt_connection_lost',
+            ],
+        ]);
+
+        $rendered = $alert->renderMessage();
+
+        $this->assertIsString($rendered);
+        $this->assertNotEmpty($rendered);
+        $this->assertEquals($rendered, $alert->display_message);
+    }
+
+    /**
+     * Test alert message rendering for COMM_LOSS with metadata.
+     */
+    public function test_alert_render_message_comm_loss(): void
+    {
+        $alert = new Alert([
+            'code' => 'COMM_LOSS',
+            'message' => 'Device ST-DEMO-001 connection lost (broker LWT or timeout)',
+            'metadata' => [
+                'status' => 'offline',
+                'reason' => 'lwt_connection_lost',
+            ],
+        ]);
+
+        $rendered = $alert->renderMessage();
+
+        $this->assertIsString($rendered);
+        $this->assertNotEmpty($rendered);
+        $this->assertEquals($rendered, $alert->display_message);
+    }
+
     /**
      * Test alert message rendering with nested array metadata does not trigger mb_ucfirst TypeError.
      */
     public function test_alert_render_message_handles_nested_array_metadata(): void
     {
         $alert = new Alert([
-            'code' => 'HIGH_WIND_STOW',
-            'message' => 'High wind safety stow active',
+            'code' => 'DEVICE_OFFLINE',
+            'message' => 'Device ST-DEMO-001 connection lost (broker LWT or timeout)',
             'metadata' => [
-                'details' => ['nested' => 'array_value'],
-                'flags' => ['wind_alarm' => false, 'limit_elev' => true],
-                'speed' => 18.5,
+                'status' => 'offline',
+                'reason' => 'lwt_connection_lost',
+                'nested' => ['foo' => 'bar', 'sub' => ['deep' => true]],
+                'tags' => ['sensor', 'connectivity'],
             ],
         ]);
 
@@ -61,5 +105,23 @@ class AlertMessageTest extends TestCase
 
         $this->assertIsString($rendered);
         $this->assertEquals('Custom alert message occurred', $rendered);
+    }
+
+    /**
+     * Test that if Lang::get returns an array (nested translation key), renderMessage falls back safely.
+     */
+    public function test_alert_render_message_handles_non_string_translation(): void
+    {
+        // 'alerts' key itself returns an array of all alerts
+        $alert = new Alert([
+            'code' => '', // $codeKey will be 'alerts.', which returns array
+            'message' => 'Fallback message text',
+            'metadata' => ['status' => 'offline'],
+        ]);
+
+        $rendered = $alert->renderMessage();
+
+        $this->assertIsString($rendered);
+        $this->assertEquals('Fallback message text', $rendered);
     }
 }

@@ -55,46 +55,33 @@ class Alert extends Model
     {
         try {
             $codeKey = 'alerts.'.$this->code;
+
             if (Lang::has($codeKey)) {
-                return (string) __($codeKey, $this->sanitizeReplacements($this->metadata));
+                $translation = Lang::get($codeKey);
+                if (is_string($translation)) {
+                    $metadata = is_array($this->metadata) ? $this->metadata : [];
+                    $scalarMetadata = array_filter($metadata, 'is_scalar');
+                    $result = __($codeKey, $scalarMetadata);
+                    if (is_string($result)) {
+                        return $result;
+                    }
+                }
             }
 
-            $jsonKey = (string) __($this->code);
-            if ($jsonKey !== $this->code) {
+            $jsonKey = __($this->code);
+            if (is_string($jsonKey) && $jsonKey !== $this->code) {
                 return $jsonKey;
             }
 
-            return (string) __($this->message);
+            $fallback = __($this->message);
+            if (is_string($fallback) && ! empty($fallback)) {
+                return $fallback;
+            }
+
+            return (string) ($this->message ?: $this->code);
         } catch (\Throwable) {
             return (string) ($this->message ?: $this->code);
         }
-    }
-
-    /**
-     * Sanitize metadata into scalar key-value pairs suitable for translation replacements.
-     *
-     * @return array<string, string>
-     */
-    protected function sanitizeReplacements(mixed $metadata): array
-    {
-        if (! is_array($metadata)) {
-            return [];
-        }
-
-        $replacements = [];
-        foreach ($metadata as $key => $value) {
-            if (is_array($value) || is_object($value)) {
-                $replacements[$key] = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '';
-            } elseif (is_bool($value)) {
-                $replacements[$key] = $value ? 'true' : 'false';
-            } elseif (is_scalar($value)) {
-                $replacements[$key] = (string) $value;
-            } else {
-                $replacements[$key] = '';
-            }
-        }
-
-        return $replacements;
     }
 
     /**

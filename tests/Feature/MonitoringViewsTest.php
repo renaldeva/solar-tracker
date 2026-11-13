@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Alert;
 use App\Models\Device;
 use App\Models\Site;
 use App\Models\Telemetry;
@@ -101,6 +102,42 @@ class MonitoringViewsTest extends TestCase
         $response->assertViewHas('primaryDevice');
         $response->assertViewHas('site');
         $response->assertViewHas('criticalAlerts');
+    }
+
+    public function test_authenticated_user_can_view_dashboard_with_device_offline_and_comm_loss_alerts(): void
+    {
+        Alert::create([
+            'device_id' => $this->device->id,
+            'severity' => 'critical',
+            'code' => 'DEVICE_OFFLINE',
+            'message' => 'Device ST-DEMO-001 connection lost (broker LWT or timeout)',
+            'status' => 'open',
+            'metadata' => [
+                'status' => 'offline',
+                'reason' => 'lwt_connection_lost',
+                'nested' => ['foo' => 'bar'],
+            ],
+            'opened_at' => Carbon::now(),
+        ]);
+
+        Alert::create([
+            'device_id' => $this->device->id,
+            'severity' => 'critical',
+            'code' => 'COMM_LOSS',
+            'message' => 'Device ST-DEMO-001 connection lost (broker LWT or timeout)',
+            'status' => 'open',
+            'metadata' => [
+                'status' => 'offline',
+                'reason' => 'lwt_connection_lost',
+            ],
+            'opened_at' => Carbon::now(),
+        ]);
+
+        $response = $this->actingAs($this->user)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertSee('DEVICE_OFFLINE');
+        $response->assertSee('COMM_LOSS');
     }
 
     public function test_authenticated_user_can_view_device_monitoring_and_filter_by_status(): void
