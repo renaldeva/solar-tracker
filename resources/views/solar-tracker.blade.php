@@ -81,7 +81,7 @@
             if (spinner) spinner.classList.remove('hidden');
             if (banner) {
                 banner.textContent = window.__ ? window.__('Mengirimkan payload perintah melalui broker MQTT...') : 'Mengirimkan payload perintah melalui broker MQTT...';
-                banner.className = 'text-xs text-muted bg-white p-3 rounded-lg border border-line';
+                banner.className = 'text-xs text-muted bg-panel p-3 rounded-lg border border-line';
             }
 
             setStepActive('step-sent');
@@ -185,28 +185,28 @@
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Pelacak menyelesaikan target stroke pada :time. Aktuator menahan posisi.', { time: cmd.completed_at }) : `Pelacak menyelesaikan target stroke pada ${cmd.completed_at}. Aktuator menahan posisi.`;
-                    banner.className = 'text-xs text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200';
+                    banner.className = 'text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800/60';
                 }
             } else if (cmd.status === 'rejected' || cmd.status === 'failed') {
                 if (spinner) spinner.classList.add('hidden');
                 if (title) {
                     title.textContent = window.__ ? window.__('Perintah :status', { status: cmd.status.toUpperCase() }) : `Perintah ${cmd.status.toUpperCase()}`;
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-rose-600';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400';
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Alasan: :reason', { reason: cmd.reason || (window.__('Kondisi keselamatan perangkat keras memicu penolakan.')) }) : `Alasan: ${cmd.reason || 'Kondisi keselamatan perangkat keras memicu penolakan.'}`;
-                    banner.className = 'text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200';
+                    banner.className = 'text-xs text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 p-3 rounded-lg border border-rose-200 dark:border-rose-800/60';
                 }
                 setStepError('step-executing');
             } else if (cmd.status === 'timeout') {
                 if (spinner) spinner.classList.add('hidden');
                 if (title) {
                     title.textContent = window.__ ? window.__('Perintah Waktu Habis') : 'Perintah Waktu Habis';
-                    title.className = 'text-xs font-bold uppercase tracking-wider text-amber-600';
+                    title.className = 'text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400';
                 }
                 if (banner) {
                     banner.textContent = window.__ ? window.__('Perangkat tidak melaporkan penyelesaian dalam batas waktu keselamatan.') : 'Perangkat tidak melaporkan penyelesaian dalam batas waktu keselamatan.';
-                    banner.className = 'text-xs text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-200';
+                    banner.className = 'text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-lg border border-amber-200 dark:border-amber-800/60';
                 }
             }
         }
@@ -214,25 +214,25 @@
         function setStepActive(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2.5 rounded-lg bg-blue-50 border border-blue-300 text-blue-700 font-semibold animate-pulse text-xs';
+            el.className = 'p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 font-semibold animate-pulse text-xs';
         }
 
         function setStepSuccess(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-700 font-bold text-xs';
+            el.className = 'p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs';
         }
 
         function setStepError(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-700 font-bold text-xs';
+            el.className = 'p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 font-bold text-xs';
         }
 
         function setStepIdle(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.className = 'p-2.5 rounded-lg bg-white border border-line text-muted font-medium text-xs';
+            el.className = 'p-2.5 rounded-lg bg-panel border border-line text-muted font-medium text-xs';
         }
 
         async function refreshCommandsLog() {
@@ -250,22 +250,22 @@
                 }
 
                 tbody.innerHTML = data.commands.map(cmd => {
-                    let statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-blue-200 bg-blue-50 text-blue-700"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>${cmd.status}</span>`;
+                    let statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>${cmd.status}</span>`;
                     if (cmd.status === 'completed') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-emerald-200 bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>${window.__ ? window.__('Completed') : 'Completed'}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>${window.__ ? window.__('Completed') : 'Completed'}</span>`;
                     } else if (cmd.status === 'rejected' || cmd.status === 'failed') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-rose-200 bg-rose-50 text-rose-700" title="${cmd.reason || ''}"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>${cmd.status}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-rose-200 dark:border-rose-800/60 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300" title="${cmd.reason || ''}"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>${cmd.status}</span>`;
                     } else if (cmd.status === 'timeout') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-amber-200 bg-amber-50 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>${window.__ ? window.__('Timeout') : 'Timeout'}</span>`;
+                        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>${window.__ ? window.__('Timeout') : 'Timeout'}</span>`;
                     }
 
                     return `
-                        <tr class="hover:bg-slate-50 transition-colors">
+                        <tr class="hover:bg-panel-alt transition-colors">
                             <td class="px-3.5 py-2.5 text-muted whitespace-nowrap font-mono">${cmd.issued_at || '--'}</td>
                             <td class="px-3.5 py-2.5 font-semibold text-ink whitespace-nowrap">${cmd.type}</td>
                             <td class="px-3.5 py-2.5 text-muted max-w-xs truncate font-mono text-[11px]">${cmd.params ? JSON.stringify(cmd.params) : '--'}</td>
                             <td class="px-3.5 py-2.5 whitespace-nowrap">${statusBadge}</td>
-                            <td class="px-3.5 py-2.5 text-slate-700 whitespace-nowrap">${cmd.issued_by || 'System'}</td>
+                            <td class="px-3.5 py-2.5 text-ink whitespace-nowrap">${cmd.issued_by || 'System'}</td>
                             <td class="px-3.5 py-2.5 text-right text-muted whitespace-nowrap font-mono">${cmd.duration_s !== null ? cmd.duration_s + 's' : '--'}</td>
                         </tr>
                     `;

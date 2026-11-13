@@ -22,19 +22,19 @@
     </x-page-header>
 
     @if(session('status'))
-        <div class="mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between shadow-xs">
+        <div class="mb-5 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-xs">
             <div class="flex items-center space-x-2.5">
-                <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 <span class="font-medium">{{ session('status') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:opacity-75 cursor-pointer text-lg leading-none">&times;</button>
+            <button onclick="this.parentElement.remove()" class="text-emerald-700 dark:text-emerald-300 hover:opacity-75 cursor-pointer text-lg leading-none">&times;</button>
         </div>
     @endif
 
     @if($errors->any())
-        <div class="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 shadow-xs">
+        <div class="mb-5 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-xs text-rose-800 dark:text-rose-300 shadow-xs">
             <div class="font-semibold mb-1">{{ __('Mohon perbaiki kesalahan berikut:') }}</div>
             <ul class="list-disc list-inside space-y-0.5">
                 @foreach($errors->all() as $err)

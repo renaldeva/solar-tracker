@@ -3,7 +3,7 @@
     @php
         $isAllNominal = ($kpis['active_alerts'] == 0) && ($kpis['max_wind_ms'] < 15.0);
     @endphp
-    <div class="mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 {{ $isAllNominal ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' : 'bg-amber-50/80 border-amber-200 text-amber-950' }}">
+    <div class="mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 {{ $isAllNominal ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-950 dark:text-emerald-200' : 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/60 text-amber-950 dark:text-amber-200' }}">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 {{ $isAllNominal ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white' }}">
                 @if($isAllNominal)
@@ -20,7 +20,7 @@
                 <h2 class="text-sm sm:text-base font-bold tracking-tight">
                     {{ $isAllNominal ? __('Semua Sistem Beroperasi Normal') : __('Perlu Tindakan Penanganan') }}
                 </h2>
-                <p class="text-xs text-slate-600 mt-0.5">
+                <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                     {{ $isAllNominal 
                         ? __('Pelacak surya aktif mengikuti posisi matahari dan produksi daya stabil.') 
                         : __('Terdapat ') . $kpis['active_alerts'] . __(' peringatan aktif pada perangkat yang membutuhkan perhatian.') }}
@@ -30,7 +30,7 @@
         <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
             <a 
                 href="{{ route('solar-tracker') }}" 
-                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-semibold transition-colors"
             >
                 <span>{{ __('Kontrol Pelacak') }}</span>
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,12 +131,12 @@
         <div class="lg:col-span-2">
             <div 
                 x-data="powerChartComponent(@js($chartData))" 
-                class="bg-white rounded-2xl border border-line p-5 sm:p-6 flex flex-col h-full"
+                class="bg-panel rounded-2xl border border-line p-5 sm:p-6 flex flex-col h-full"
             >
                 <!-- Chart Header & Tab Selector -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-line gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                             </svg>
@@ -148,11 +148,11 @@
                     </div>
 
                     <!-- Day / Week / Month Pill Selector -->
-                    <div class="inline-flex items-center p-1 bg-slate-100/80 rounded-full self-start sm:self-auto border border-slate-200/60">
+                    <div class="inline-flex items-center p-1 bg-slate-100/80 dark:bg-slate-800/80 rounded-full self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
                         <button 
                             type="button" 
                             @click="switchView('day')" 
-                            :class="activeView === 'day' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            :class="activeView === 'day' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'"
                             class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Hari') }} (W)
@@ -160,7 +160,7 @@
                         <button 
                             type="button" 
                             @click="switchView('week')" 
-                            :class="activeView === 'week' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            :class="activeView === 'week' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'"
                             class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Minggu') }} (kWh)
@@ -168,7 +168,7 @@
                         <button 
                             type="button" 
                             @click="switchView('month')" 
-                            :class="activeView === 'month' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            :class="activeView === 'month' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'"
                             class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Bulan') }} (kWh)
@@ -186,10 +186,10 @@
         <!-- Kolom Kanan (1/3 col): Target Gauge + Alert Kritis -->
         <div class="lg:col-span-1 space-y-6">
             <!-- 1. Gauge Setengah Lingkaran: Target Energi Harian -->
-            <div class="bg-white rounded-2xl border border-line p-5 flex flex-col items-center justify-between">
+            <div class="bg-panel rounded-2xl border border-line p-5 flex flex-col items-center justify-between">
                 <div class="w-full flex items-center justify-between pb-3 border-b border-line">
                     <span class="text-xs font-semibold text-muted uppercase tracking-wider">{{ __('Capaian Target Energi') }}</span>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                         {{ $kpis['energy_progress_percent'] }}%
                     </span>
                 </div>
@@ -233,7 +233,7 @@
                     </div>
                 </div>
 
-                <div class="w-full pt-3 border-t border-slate-100 text-center">
+                <div class="w-full pt-3 border-t border-line text-center">
                     <p class="text-xs text-muted">
                         {{ $gaugePercent >= 100 ? __('Target harian tercapai!') : __('Produksi aktif menuju target harian.') }}
                     </p>
@@ -255,26 +255,26 @@
                                 $alertSeverity = strtolower((string) $alert->severity);
                                 $sevConfig = match($alertSeverity) {
                                     'critical' => [
-                                        'border' => 'border-rose-200',
-                                        'bg' => 'bg-rose-50',
-                                        'text' => 'text-rose-700',
+                                        'border' => 'border-rose-200 dark:border-rose-800/60',
+                                        'bg' => 'bg-rose-50 dark:bg-rose-950/40',
+                                        'text' => 'text-rose-700 dark:text-rose-300',
                                         'dot' => 'bg-rose-500',
                                     ],
                                     'warning' => [
-                                        'border' => 'border-amber-200',
-                                        'bg' => 'bg-amber-50',
-                                        'text' => 'text-amber-700',
+                                        'border' => 'border-amber-200 dark:border-amber-800/60',
+                                        'bg' => 'bg-amber-50 dark:bg-amber-950/40',
+                                        'text' => 'text-amber-700 dark:text-amber-300',
                                         'dot' => 'bg-amber-500',
                                     ],
                                     default => [
-                                        'border' => 'border-blue-200',
-                                        'bg' => 'bg-blue-50',
-                                        'text' => 'text-blue-700',
+                                        'border' => 'border-blue-200 dark:border-blue-800/60',
+                                        'bg' => 'bg-blue-50 dark:bg-blue-950/40',
+                                        'text' => 'text-blue-700 dark:text-blue-300',
                                         'dot' => 'bg-blue-500',
                                     ],
                                 };
                             @endphp
-                            <div class="p-3 rounded-xl border border-line bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                            <div class="p-3 rounded-xl border border-line bg-panel-alt/50 hover:bg-panel-alt transition-colors">
                                 <div class="flex items-center justify-between gap-2 mb-1.5">
                                     <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border {{ $sevConfig['border'] }} {{ $sevConfig['bg'] }} {{ $sevConfig['text'] }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ $sevConfig['dot'] }}"></span>
@@ -293,8 +293,8 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="p-6 text-center border border-dashed border-line rounded-xl bg-slate-50/50">
-                        <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 mb-1">
+                    <div class="p-6 text-center border border-dashed border-line rounded-xl bg-panel-alt/30">
+                        <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
                             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             <span>{{ __('Semua Sistem Normal') }}</span>
                         </div>
@@ -331,7 +331,7 @@
                         </thead>
                         <tbody class="divide-y divide-line text-ink">
                             @forelse($devices as $dev)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr class="hover:bg-panel-alt transition-colors">
                                     <td class="py-3 pr-3">
                                         <div class="font-semibold text-ink">{{ $dev->name }}</div>
                                         <div class="font-mono text-[11px] text-muted">{{ $dev->uid }}</div>
@@ -340,7 +340,7 @@
                                         <x-status-pill :status="$dev->status" size="sm" />
                                     </td>
                                     <td class="py-3 px-3">
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase border border-slate-200 bg-slate-100 text-slate-700">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase border border-line bg-panel-alt text-ink">
                                             {{ $dev->mode }}
                                         </span>
                                     </td>
@@ -383,30 +383,30 @@
                 @if($primaryDevice)
                     <div class="space-y-3">
                         <!-- Mode Operasi -->
-                        <div class="flex items-center justify-between p-3 rounded-xl border border-line bg-slate-50/60 text-xs">
+                        <div class="flex items-center justify-between p-3 rounded-xl border border-line bg-panel-alt/60 text-xs">
                             <span class="text-muted font-medium">{{ __('Mode Operasi:') }}</span>
-                            <span class="font-bold text-blue-600 uppercase">{{ $primaryDevice->mode }}</span>
+                            <span class="font-bold text-blue-600 dark:text-blue-400 uppercase">{{ $primaryDevice->mode }}</span>
                         </div>
 
                         <!-- 3 Parameter Utama (Tegangan, Arus, Daya) -->
                         <div class="grid grid-cols-3 gap-2">
-                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                            <div class="p-3 rounded-xl border border-line bg-panel text-center">
                                 <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Tegangan') }}</div>
                                 <div class="text-base font-bold font-mono text-ink mt-0.5">
                                     {{ $latestTelemetry ? formatNumberId($latestTelemetry->voltage, 1) : '--' }}
                                 </div>
                                 <div class="text-[10px] text-muted font-medium">V</div>
                             </div>
-                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                            <div class="p-3 rounded-xl border border-line bg-panel text-center">
                                 <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Arus') }}</div>
                                 <div class="text-base font-bold font-mono text-ink mt-0.5">
                                     {{ $latestTelemetry ? formatNumberId($latestTelemetry->current, 2) : '--' }}
                                 </div>
                                 <div class="text-[10px] text-muted font-medium">A</div>
                             </div>
-                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                            <div class="p-3 rounded-xl border border-line bg-panel text-center">
                                 <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Daya') }}</div>
-                                <div class="text-base font-bold font-mono text-blue-600 mt-0.5 truncate">
+                                <div class="text-base font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5 truncate">
                                     {{ formatPowerW($latestTelemetry?->power, false) }}
                                 </div>
                                 <div class="text-[10px] text-muted font-medium">W</div>
@@ -417,7 +417,7 @@
                         <button 
                             type="button" 
                             @click="showDetail = !showDetail" 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl border border-line bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                            class="w-full flex items-center justify-between p-2.5 rounded-xl border border-line bg-panel-alt hover:bg-panel-alt/80 text-xs font-semibold text-ink transition-colors cursor-pointer"
                         >
                             <span>{{ __('Lihat Detail Penyesuaian Sudut') }}</span>
                             <svg class="w-4 h-4 transform transition-transform duration-200" :class="showDetail ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -428,7 +428,7 @@
                         <!-- Area Detail Teknis (Elevasi & Azimut) -->
                         <div x-show="showDetail" x-cloak class="space-y-2.5 pt-1">
                             <!-- Elevasi (Pitch) Alignment -->
-                            <div class="p-3 rounded-xl border border-line bg-slate-50/50">
+                            <div class="p-3 rounded-xl border border-line bg-panel-alt/50">
                                 <div class="flex items-center justify-between text-xs mb-1.5">
                                     <span class="font-semibold text-ink">{{ __('Sudut Kemiringan (Elevasi)') }}</span>
                                     <span class="text-[11px] text-muted capitalize">
@@ -444,7 +444,7 @@
                                     </div>
                                     <div>
                                         <div class="text-[10px] text-muted">{{ __('Target (Matahari)') }}</div>
-                                        <div class="text-sm font-bold font-mono text-blue-600 mt-0.5">
+                                        <div class="text-sm font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
                                             {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_elev, 1) : '--' }}°
                                         </div>
                                     </div>
@@ -452,7 +452,7 @@
                             </div>
 
                             <!-- Azimut (Heading) Alignment -->
-                            <div class="p-3 rounded-xl border border-line bg-slate-50/50">
+                            <div class="p-3 rounded-xl border border-line bg-panel-alt/50">
                                 <div class="flex items-center justify-between text-xs mb-1.5">
                                     <span class="font-semibold text-ink">{{ __('Arah Kompas (Azimut)') }}</span>
                                     <span class="text-[11px] text-muted capitalize">
@@ -468,7 +468,7 @@
                                     </div>
                                     <div>
                                         <div class="text-[10px] text-muted">{{ __('Target (Matahari)') }}</div>
-                                        <div class="text-sm font-bold font-mono text-blue-600 mt-0.5">
+                                        <div class="text-sm font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
                                             {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_az, 1) : '--' }}°
                                         </div>
                                     </div>
@@ -479,7 +479,7 @@
                         <!-- Link to Solar Tracker -->
                         <a 
                             href="{{ route('solar-tracker') }}" 
-                            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs transition-colors"
+                            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold text-xs transition-colors"
                         >
                             <span>{{ __('Buka Kontrol Tracker') }}</span>
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

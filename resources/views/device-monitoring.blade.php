@@ -8,7 +8,7 @@
             <div class="flex items-center space-x-2">
                 <a 
                     href="{{ route('device-monitoring.export', ['status' => $statusFilter]) }}" 
-                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-slate-50 text-ink text-sm font-medium transition-colors shadow-xs"
+                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-panel-alt text-ink text-sm font-medium transition-colors shadow-xs"
                     title="{{ __('Export CSV') }}"
                 >
                     <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,7 +19,7 @@
                 <button 
                     type="button" 
                     onclick="window.location.reload()" 
-                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-slate-50 text-ink text-sm font-medium transition-colors shadow-xs cursor-pointer"
+                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-panel-alt text-ink text-sm font-medium transition-colors shadow-xs cursor-pointer"
                     title="{{ __('Refresh') }}"
                 >
                     <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">

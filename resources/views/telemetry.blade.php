@@ -30,9 +30,9 @@
     </x-page-header>
 
     <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
-    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+    <div class="mb-6 p-4 rounded-2xl bg-panel border border-line shadow-xs flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
-            <div class="w-3.5 h-3.5 rounded-full {{ ($device && $device->status === 'online') ? 'bg-emerald-500 ring-4 ring-emerald-50' : 'bg-amber-500 ring-4 ring-amber-50' }}"></div>
+            <div class="w-3.5 h-3.5 rounded-full {{ ($device && $device->status === 'online') ? 'bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-950/50' : 'bg-amber-500 ring-4 ring-amber-50 dark:ring-amber-950/50' }}"></div>
             <div>
                 <h2 class="text-sm font-semibold text-ink">
                     @if($device && $device->status === 'online')
@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="hidden sm:flex items-center space-x-2">
-            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                 STREAM 5s
             </span>
@@ -55,7 +55,7 @@
     </div>
 
     <!-- Filter & Control Card (Smart Nursery Style) -->
-    <div class="bg-white border border-line rounded-2xl p-5 mb-6 shadow-xs" x-data="{ rangeMode: '{{ $selectedRange }}' }">
+    <div class="bg-panel border border-line rounded-2xl p-5 mb-6 shadow-xs" x-data="{ rangeMode: '{{ $selectedRange }}' }">
         <form method="GET" action="{{ route('telemetry') }}" id="telemetryFilterForm" class="space-y-4">
             <!-- Row 1: Device Selector & Range Pills -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -67,7 +67,7 @@
                             id="filter-device" 
                             name="device" 
                             onchange="this.form.submit()" 
-                            class="appearance-none text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2 text-ink focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                            class="appearance-none text-xs font-semibold bg-panel border border-line rounded-xl pl-3 pr-8 py-2 text-ink focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         >
                             @foreach($devices as $dev)
                                 <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
@@ -116,7 +116,7 @@
                         type="datetime-local" 
                         name="start_date" 
                         value="{{ $startDate }}" 
-                        class="bg-white border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
+                        class="bg-panel border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
                     >
                 </div>
                 <div class="flex items-center space-x-2 text-xs">
@@ -125,7 +125,7 @@
                         type="datetime-local" 
                         name="end_date" 
                         value="{{ $endDate }}" 
-                        class="bg-white border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
+                        class="bg-panel border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
                     >
                 </div>
                 <button 

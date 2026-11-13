@@ -8,7 +8,7 @@
             <div class="flex items-center space-x-2">
                 <a 
                     href="{{ route('historical-data.export', request()->all()) }}" 
-                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-slate-50 text-ink text-sm font-medium transition-colors shadow-xs"
+                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-panel-alt text-ink text-sm font-medium transition-colors shadow-xs"
                     title="{{ __('Ekspor Kumpulan Data CSV') }}"
                 >
                     <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
