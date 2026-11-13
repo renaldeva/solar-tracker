@@ -1,21 +1,44 @@
 <x-layouts.app title="{{ __('Dashboard') }}">
-    <!-- Page Header -->
-    <x-page-header 
-        :title="__('Dashboard Pemantauan Solar Tracker')" 
-        :subtitle="__('Monitoring telemetri dual-axis real-time dan analitik performa array surya.')"
-    >
-        <x-slot:actions>
+    <!-- Banner Status Besar: "Apakah semuanya baik-baik saja?" -->
+    @php
+        $isAllNominal = ($kpis['active_alerts'] == 0) && ($kpis['max_wind_ms'] < 15.0);
+    @endphp
+    <div class="mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 {{ $isAllNominal ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' : 'bg-amber-50/80 border-amber-200 text-amber-950' }}">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 {{ $isAllNominal ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white' }}">
+                @if($isAllNominal)
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                @else
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                @endif
+            </div>
+            <div>
+                <h2 class="text-sm sm:text-base font-bold tracking-tight">
+                    {{ $isAllNominal ? __('Semua Sistem Beroperasi Normal') : __('Perlu Tindakan Penanganan') }}
+                </h2>
+                <p class="text-xs text-slate-600 mt-0.5">
+                    {{ $isAllNominal 
+                        ? __('Pelacak surya aktif mengikuti posisi matahari dan produksi daya stabil.') 
+                        : __('Terdapat ') . $kpis['active_alerts'] . __(' peringatan aktif pada perangkat yang membutuhkan perhatian.') }}
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
             <a 
                 href="{{ route('solar-tracker') }}" 
-                class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded border border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-mono font-medium transition-colors"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
             >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <span>{{ __('Kontrol Pelacak') }}</span>
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
-                <span>{{ __('Kontrol Pelacak') }} &rarr;</span>
             </a>
-        </x-slot:actions>
-    </x-page-header>
+        </div>
+    </div>
 
     <!-- Top KPI Cards Row (5 Cards) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -26,51 +49,64 @@
             unit="Unit"
             badge="{{ $kpis['online_devices'] }} Online"
             tone="ok"
-            subtitle="{{ $kpis['online_devices'] }} online · {{ $kpis['offline_devices'] }} offline"
-        />
+            subtitle="{{ $kpis['online_devices'] }} aktif normal · {{ $kpis['offline_devices'] }} mati"
+        >
+            <x-slot:icon>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </x-slot:icon>
+        </x-kpi-card>
 
         <!-- 2. Energi Hari Ini (dengan progress bar ke target) -->
-        <div class="bg-panel rounded-md border border-line p-4 flex flex-col justify-between">
-            <div class="flex items-start justify-between gap-2 mb-2">
-                <span class="text-xs font-medium text-muted uppercase tracking-wider truncate">{{ __('Energi Hari Ini') }}</span>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium border border-accent/30 bg-accent/10 text-accent">
-                    <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
-                    <span>{{ $kpis['energy_progress_percent'] }}%</span>
-                </span>
+        <x-kpi-card 
+            :title="__('Energi Hari Ini')" 
+            :value="formatNumberId($kpis['daily_energy_kwh'], 1)" 
+            unit="kWh"
+            badge="{{ $kpis['energy_progress_percent'] }}%"
+            tone="accent"
+            subtitle="{{ __('Target: ') . formatNumberId($kpis['energy_target_kwh'], 1) . ' kWh' }}"
+        >
+            <x-slot:icon>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </x-slot:icon>
+            <!-- Progress Bar ke Target -->
+            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden mt-1">
+                <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style="width: {{ min(100, $kpis['energy_progress_percent']) }}%"></div>
             </div>
-
-            <div class="flex items-baseline gap-1 my-1">
-                <span class="text-3xl font-bold font-mono tabular-nums text-ink tracking-tight">{{ formatNumberId($kpis['daily_energy_kwh'], 1) }}</span>
-                <span class="text-xs font-mono text-muted font-normal">kWh</span>
-            </div>
-
-            <div class="mt-2 pt-2 border-t border-line/50">
-                <div class="w-full bg-line/60 rounded h-1.5 overflow-hidden mb-1.5">
-                    <div class="bg-accent h-1.5 rounded transition-all duration-300" style="width: {{ min(100, $kpis['energy_progress_percent']) }}%"></div>
-                </div>
-                <div class="flex items-center justify-between text-xs font-mono text-muted">
-                    <span>{{ __('Target') }}:</span>
-                    <span class="text-ink font-medium">{{ formatNumberId($kpis['energy_target_kwh'], 1) }} kWh</span>
-                </div>
-            </div>
-        </div>
+        </x-kpi-card>
 
         <!-- 3. Daya Puncak Hari Ini (W) -->
         <x-kpi-card 
             :title="__('Daya Puncak Hari Ini')" 
             :value="formatPowerW($kpis['peak_power_w'] ?? ($kpis['peak_power_kw'] * 1000), false)" 
             unit="W"
-            :subtitle="__('Maksimum array')"
-        />
+            :subtitle="__('Output daya listrik tertinggi')"
+            tone="accent"
+        >
+            <x-slot:icon>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </x-slot:icon>
+        </x-kpi-card>
 
         <!-- 4. Alert Aktif (merah jika > 0) -->
         <x-kpi-card 
             :title="__('Alert Aktif')" 
             :value="$kpis['active_alerts']" 
             tone="{{ $kpis['active_alerts'] > 0 ? 'danger' : 'ok' }}"
-            badge="{{ $kpis['active_alerts'] > 0 ? __('PERHATIAN') : __('NOMINAL') }}"
-            subtitle="{{ $kpis['active_alerts'] > 0 ? __('Membutuhkan tindakan') : __('Semua sistem normal') }}"
-        />
+            badge="{{ $kpis['active_alerts'] > 0 ? __('PERHATIAN') : __('NORMAL') }}"
+            subtitle="{{ $kpis['active_alerts'] > 0 ? __('Perlu tindakan segera') : __('Semua sistem aman') }}"
+        >
+            <x-slot:icon>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            </x-slot:icon>
+        </x-kpi-card>
 
         <!-- 5. Angin Maks (m/s, merah jika > 15) -->
         <x-kpi-card 
@@ -78,49 +114,62 @@
             :value="formatNumberId($kpis['max_wind_ms'], 1)" 
             unit="m/s"
             tone="{{ $kpis['max_wind_ms'] >= 15.0 ? 'danger' : 'neutral' }}"
-            badge="{{ $kpis['max_wind_ms'] >= 15.0 ? __('STOW') : __('NORMAL') }}"
-            subtitle="{{ __('Batas stow: 15.0 m/s') }}"
-        />
+            badge="{{ $kpis['max_wind_ms'] >= 15.0 ? __('STOW') : __('AMAN') }}"
+            subtitle="{{ $kpis['max_wind_ms'] >= 15.0 ? __('Batas stow terlampaui') : __('Di bawah batas aman (15 m/s)') }}"
+        >
+            <x-slot:icon>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </x-slot:icon>
+        </x-kpi-card>
     </div>
 
-    <!-- Middle Row: Power Production Chart (2/3) + Critical Alerts (1/3) -->
+    <!-- Middle Row: Power Production Chart (2/3) + Target Gauge & Critical Alerts (1/3) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Grafik Produksi Daya (2/3 cols) -->
         <div class="lg:col-span-2">
             <div 
                 x-data="powerChartComponent(@js($chartData))" 
-                class="bg-panel rounded-md border border-line p-4 flex flex-col h-full"
+                class="bg-white rounded-2xl border border-line p-5 sm:p-6 flex flex-col h-full"
             >
                 <!-- Chart Header & Tab Selector -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-line gap-2">
-                    <div>
-                        <h2 class="text-sm font-semibold text-ink tracking-tight">{{ __('Produksi Daya') }}</h2>
-                        <p class="text-xs text-muted mt-0.5">{{ __('Hasil daya DC surya dari sensor PZEM-017') }}</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-line gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-sm sm:text-base font-bold text-ink tracking-tight">{{ __('Produksi Daya') }}</h2>
+                            <p class="text-xs text-muted mt-0.5">{{ __('Hasil daya listrik real-time dari array surya (PZEM-017)') }}</p>
+                        </div>
                     </div>
 
-                    <!-- Day / Week / Month Tab Selector -->
-                    <div class="inline-flex items-center p-0.5 bg-bg border border-line rounded self-start sm:self-auto">
+                    <!-- Day / Week / Month Pill Selector -->
+                    <div class="inline-flex items-center p-1 bg-slate-100/80 rounded-full self-start sm:self-auto border border-slate-200/60">
                         <button 
                             type="button" 
                             @click="switchView('day')" 
-                            :class="activeView === 'day' ? 'bg-accent/20 text-accent font-semibold border border-accent/40' : 'text-muted hover:text-ink border border-transparent'"
-                            class="px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer"
+                            :class="activeView === 'day' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Hari') }} (W)
                         </button>
                         <button 
                             type="button" 
                             @click="switchView('week')" 
-                            :class="activeView === 'week' ? 'bg-accent/20 text-accent font-semibold border border-accent/40' : 'text-muted hover:text-ink border border-transparent'"
-                            class="px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer"
+                            :class="activeView === 'week' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Minggu') }} (kWh)
                         </button>
                         <button 
                             type="button" 
                             @click="switchView('month')" 
-                            :class="activeView === 'month' ? 'bg-accent/20 text-accent font-semibold border border-accent/40' : 'text-muted hover:text-ink border border-transparent'"
-                            class="px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer"
+                            :class="activeView === 'month' ? 'bg-blue-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                            class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
                         >
                             {{ __('Bulan') }} (kWh)
                         </button>
@@ -134,11 +183,67 @@
             </div>
         </div>
 
-        <!-- Panel Alert Kritis (1/3 col) -->
-        <div class="lg:col-span-1">
-            <x-card :title="__('Alert Kritis')" :subtitle="__('Peringatan terbuka yang memerlukan tinjauan')">
+        <!-- Kolom Kanan (1/3 col): Target Gauge + Alert Kritis -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- 1. Gauge Setengah Lingkaran: Target Energi Harian -->
+            <div class="bg-white rounded-2xl border border-line p-5 flex flex-col items-center justify-between">
+                <div class="w-full flex items-center justify-between pb-3 border-b border-line">
+                    <span class="text-xs font-semibold text-muted uppercase tracking-wider">{{ __('Capaian Target Energi') }}</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                        {{ $kpis['energy_progress_percent'] }}%
+                    </span>
+                </div>
+
+                <!-- Half-circle SVG Gauge -->
+                @php
+                    $gaugePercent = min(100, max(0, (float) $kpis['energy_progress_percent']));
+                    // Circumference of semicircle r=70 is pi * 70 = 219.91
+                    $semiCircumference = 219.91;
+                    $dashOffset = $semiCircumference * (1 - ($gaugePercent / 100));
+                @endphp
+                <div class="relative w-48 h-28 my-3 flex items-end justify-center">
+                    <svg class="w-48 h-28 overflow-visible" viewBox="0 0 160 90">
+                        <!-- Background arc -->
+                        <path 
+                            d="M 15 80 A 65 65 0 0 1 145 80" 
+                            fill="none" 
+                            stroke="#e2e8f0" 
+                            stroke-width="12" 
+                            stroke-linecap="round"
+                        />
+                        <!-- Value arc -->
+                        <path 
+                            d="M 15 80 A 65 65 0 0 1 145 80" 
+                            fill="none" 
+                            stroke="#2563eb" 
+                            stroke-width="12" 
+                            stroke-linecap="round"
+                            stroke-dasharray="204.2"
+                            stroke-dashoffset="{{ 204.2 * (1 - ($gaugePercent / 100)) }}"
+                            class="transition-all duration-700 ease-out"
+                        />
+                    </svg>
+                    <div class="absolute bottom-1 text-center">
+                        <div class="text-2xl font-bold font-mono text-ink tabular-nums leading-none">
+                            {{ $gaugePercent }}<span class="text-base font-normal text-muted">%</span>
+                        </div>
+                        <div class="text-[11px] text-muted font-medium mt-1">
+                            {{ formatNumberId($kpis['daily_energy_kwh'], 1) }} / {{ formatNumberId($kpis['energy_target_kwh'], 1) }} kWh
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full pt-3 border-t border-slate-100 text-center">
+                    <p class="text-xs text-muted">
+                        {{ $gaugePercent >= 100 ? __('Target harian tercapai!') : __('Produksi aktif menuju target harian.') }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Panel Alert Kritis -->
+            <x-card :title="__('Alert Kritis')" :subtitle="__('Peringatan terbuka yang memerlukan perhatian')">
                 <x-slot:actions>
-                    <a href="{{ route('alerts') }}" class="text-xs font-mono text-accent hover:underline">
+                    <a href="{{ route('alerts') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
                         {{ __('Lihat semua') }} &rarr;
                     </a>
                 </x-slot:actions>
@@ -150,47 +255,47 @@
                                 $alertSeverity = strtolower((string) $alert->severity);
                                 $sevConfig = match($alertSeverity) {
                                     'critical' => [
-                                        'border' => 'border-danger/30',
-                                        'bg' => 'bg-danger/10',
-                                        'text' => 'text-danger',
-                                        'dot' => 'bg-danger',
+                                        'border' => 'border-rose-200',
+                                        'bg' => 'bg-rose-50',
+                                        'text' => 'text-rose-700',
+                                        'dot' => 'bg-rose-500',
                                     ],
                                     'warning' => [
-                                        'border' => 'border-warn/30',
-                                        'bg' => 'bg-warn/10',
-                                        'text' => 'text-warn',
-                                        'dot' => 'bg-warn',
+                                        'border' => 'border-amber-200',
+                                        'bg' => 'bg-amber-50',
+                                        'text' => 'text-amber-700',
+                                        'dot' => 'bg-amber-500',
                                     ],
                                     default => [
-                                        'border' => 'border-accent/30',
-                                        'bg' => 'bg-accent/10',
-                                        'text' => 'text-accent',
-                                        'dot' => 'bg-accent',
+                                        'border' => 'border-blue-200',
+                                        'bg' => 'bg-blue-50',
+                                        'text' => 'text-blue-700',
+                                        'dot' => 'bg-blue-500',
                                     ],
                                 };
                             @endphp
-                            <div class="p-3 rounded border border-line bg-bg/50">
+                            <div class="p-3 rounded-xl border border-line bg-slate-50/50 hover:bg-slate-50 transition-colors">
                                 <div class="flex items-center justify-between gap-2 mb-1.5">
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium border {{ $sevConfig['border'] }} {{ $sevConfig['bg'] }} {{ $sevConfig['text'] }}">
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border {{ $sevConfig['border'] }} {{ $sevConfig['bg'] }} {{ $sevConfig['text'] }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ $sevConfig['dot'] }}"></span>
                                         <span>{{ strtoupper($alert->severity) }}</span>
                                     </span>
-                                    <span class="text-[11px] font-mono text-muted">
+                                    <span class="text-[11px] text-muted">
                                         {{ $alert->opened_at?->diffForHumans() }}
                                     </span>
                                 </div>
-                                <div class="font-mono font-semibold text-xs text-ink truncate">{{ $alert->code }}</div>
+                                <div class="font-semibold text-xs text-ink truncate">{{ $alert->code }}</div>
                                 <div class="text-xs text-muted mt-0.5 leading-snug">{{ $alert->display_message }}</div>
-                                <div class="text-[11px] font-mono text-muted/70 mt-1.5 pt-1.5 border-t border-line/40">
-                                    UID: {{ $alert->device->uid ?? __('System') }}
+                                <div class="text-[11px] text-muted/80 mt-1.5 pt-1.5 border-t border-line">
+                                    {{ __('Perangkat: ') }} {{ $alert->device->name ?? $alert->device->uid ?? __('Sistem') }}
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 @else
-                    <div class="p-6 text-center border border-line/40 rounded bg-bg/40">
-                        <div class="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-ok mb-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-ok"></span>
+                    <div class="p-6 text-center border border-dashed border-line rounded-xl bg-slate-50/50">
+                        <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             <span>{{ __('Semua Sistem Normal') }}</span>
                         </div>
                         <p class="text-xs text-muted mt-1">{{ __('Tidak ada peringatan kritis aktif.') }}</p>
@@ -204,57 +309,57 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Tabel Status Perangkat (2/3 cols) -->
         <div class="lg:col-span-2">
-            <x-card :title="__('Status Perangkat')" :subtitle="__('Daftar node solar tracker terdaftar')">
+            <x-card :title="__('Status Perangkat')" :subtitle="__('Daftar node solar tracker terdaftar dan kondisinya')">
                 <x-slot:actions>
-                    <a href="{{ route('device-monitoring') }}" class="text-xs font-mono text-accent hover:underline">
-                        {{ __('Buka Pemantauan') }} &rarr;
+                    <a href="{{ route('device-monitoring') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                        {{ __('Pemantauan Lengkap') }} &rarr;
                     </a>
                 </x-slot:actions>
 
-                <div class="overflow-x-auto -mx-4 -my-4 p-4">
+                <div class="overflow-x-auto -mx-5 -my-5 p-5">
                     <table class="min-w-full divide-y divide-line text-xs">
                         <thead>
-                            <tr class="text-left font-mono uppercase text-muted tracking-wider">
-                                <th class="py-2 pr-3">{{ __('Perangkat') }}</th>
-                                <th class="py-2 px-3">{{ __('Status') }}</th>
-                                <th class="py-2 px-3">{{ __('Mode') }}</th>
-                                <th class="py-2 px-3 text-right">{{ __('Daya DC') }}</th>
-                                <th class="py-2 px-3 text-right">{{ __('Tegangan') }}</th>
-                                <th class="py-2 px-3 text-right">{{ __('Sinyal') }}</th>
-                                <th class="py-2 pl-3 text-right">{{ __('Terakhir Dilihat') }}</th>
+                            <tr class="text-left font-semibold text-muted uppercase tracking-wider">
+                                <th class="py-2.5 pr-3">{{ __('Perangkat') }}</th>
+                                <th class="py-2.5 px-3">{{ __('Status') }}</th>
+                                <th class="py-2.5 px-3">{{ __('Mode') }}</th>
+                                <th class="py-2.5 px-3 text-right">{{ __('Daya DC') }}</th>
+                                <th class="py-2.5 px-3 text-right">{{ __('Tegangan') }}</th>
+                                <th class="py-2.5 px-3 text-right">{{ __('Sinyal') }}</th>
+                                <th class="py-2.5 pl-3 text-right">{{ __('Terakhir Dilihat') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-line text-ink">
                             @forelse($devices as $dev)
-                                <tr class="hover:bg-bg/40 transition-colors">
-                                    <td class="py-2.5 pr-3">
-                                        <div class="font-medium text-ink">{{ $dev->name }}</div>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="py-3 pr-3">
+                                        <div class="font-semibold text-ink">{{ $dev->name }}</div>
                                         <div class="font-mono text-[11px] text-muted">{{ $dev->uid }}</div>
                                     </td>
-                                    <td class="py-2.5 px-3">
+                                    <td class="py-3 px-3">
                                         <x-status-pill :status="$dev->status" size="sm" />
                                     </td>
-                                    <td class="py-2.5 px-3">
-                                        <span class="inline-block px-1.5 py-0.5 rounded font-mono text-[11px] uppercase border border-line bg-bg text-muted">
+                                    <td class="py-3 px-3">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase border border-slate-200 bg-slate-100 text-slate-700">
                                             {{ $dev->mode }}
                                         </span>
                                     </td>
-                                    <td class="py-2.5 px-3 text-right font-mono font-medium text-ink">
+                                    <td class="py-3 px-3 text-right font-mono font-semibold text-ink">
                                         {{ formatPowerW($dev->latestTelemetry?->power) }}
                                     </td>
-                                    <td class="py-2.5 px-3 text-right font-mono text-muted">
+                                    <td class="py-3 px-3 text-right font-mono text-muted">
                                         {{ $dev->latestTelemetry ? formatNumberId($dev->latestTelemetry->voltage, 1) . ' V' : '--' }}
                                     </td>
-                                    <td class="py-2.5 px-3 text-right font-mono text-muted">
+                                    <td class="py-3 px-3 text-right font-mono text-muted">
                                         {{ $dev->rssi ? $dev->rssi . ' dBm' : '--' }}
                                     </td>
-                                    <td class="py-2.5 pl-3 text-right font-mono text-muted">
+                                    <td class="py-3 pl-3 text-right font-mono text-muted">
                                         {{ $dev->last_seen_at ? $dev->last_seen_at->setTimezone('Asia/Jakarta')->format('H.i.s') . ' WIB' : '--' }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-6 text-center text-muted">
+                                    <td colspan="7" class="py-8 text-center text-muted">
                                         {{ __('Tidak ada perangkat terdaftar.') }}
                                     </td>
                                 </tr>
@@ -265,10 +370,10 @@
             </x-card>
         </div>
 
-        <!-- Panel Metrik Live dari $latestTelemetry (1/3 col) -->
-        <div class="lg:col-span-1">
+        <!-- Panel Metrik Live dari $latestTelemetry (1/3 col) dengan accordion detail -->
+        <div class="lg:col-span-1" x-data="{ showDetail: false }">
             <x-card 
-                :title="__('Metrik Live Array')" 
+                :title="__('Metrik Langsung')" 
                 :subtitle="$primaryDevice ? $primaryDevice->name . ' (' . $primaryDevice->uid . ')' : __('Tidak ada perangkat')"
             >
                 <x-slot:actions>
@@ -277,80 +382,95 @@
 
                 @if($primaryDevice)
                     <div class="space-y-3">
-                        <!-- Mode & Status Header -->
-                        <div class="flex items-center justify-between p-2.5 rounded border border-line bg-bg/50 text-xs font-mono">
-                            <span class="text-muted">{{ __('Mode Operasi:') }}</span>
-                            <span class="font-bold text-accent uppercase">{{ $primaryDevice->mode }}</span>
+                        <!-- Mode Operasi -->
+                        <div class="flex items-center justify-between p-3 rounded-xl border border-line bg-slate-50/60 text-xs">
+                            <span class="text-muted font-medium">{{ __('Mode Operasi:') }}</span>
+                            <span class="font-bold text-blue-600 uppercase">{{ $primaryDevice->mode }}</span>
                         </div>
 
-                        <!-- Parameter List (voltage, current, power) -->
+                        <!-- 3 Parameter Utama (Tegangan, Arus, Daya) -->
                         <div class="grid grid-cols-3 gap-2">
-                            <div class="p-2.5 rounded border border-line bg-bg/50">
-                                <div class="text-[10px] font-mono text-muted uppercase">{{ __('Tegangan') }}</div>
+                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                                <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Tegangan') }}</div>
                                 <div class="text-base font-bold font-mono text-ink mt-0.5">
                                     {{ $latestTelemetry ? formatNumberId($latestTelemetry->voltage, 1) : '--' }}
                                 </div>
-                                <div class="text-[10px] font-mono text-muted">V</div>
+                                <div class="text-[10px] text-muted font-medium">V</div>
                             </div>
-                            <div class="p-2.5 rounded border border-line bg-bg/50">
-                                <div class="text-[10px] font-mono text-muted uppercase">{{ __('Arus') }}</div>
+                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                                <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Arus') }}</div>
                                 <div class="text-base font-bold font-mono text-ink mt-0.5">
                                     {{ $latestTelemetry ? formatNumberId($latestTelemetry->current, 2) : '--' }}
                                 </div>
-                                <div class="text-[10px] font-mono text-muted">A</div>
+                                <div class="text-[10px] text-muted font-medium">A</div>
                             </div>
-                            <div class="p-2.5 rounded border border-line bg-bg/50">
-                                <div class="text-[10px] font-mono text-muted uppercase">{{ __('Daya') }}</div>
-                                <div class="text-base font-bold font-mono text-ink mt-0.5 truncate">
+                            <div class="p-3 rounded-xl border border-line bg-white text-center">
+                                <div class="text-[11px] font-semibold text-muted uppercase">{{ __('Daya') }}</div>
+                                <div class="text-base font-bold font-mono text-blue-600 mt-0.5 truncate">
                                     {{ formatPowerW($latestTelemetry?->power, false) }}
                                 </div>
-                                <div class="text-[10px] font-mono text-muted">W</div>
+                                <div class="text-[10px] text-muted font-medium">W</div>
                             </div>
                         </div>
 
-                        <!-- Elevasi (Pitch) Alignment -->
-                        <div class="p-2.5 rounded border border-line bg-bg/50">
-                            <div class="flex items-center justify-between text-xs mb-1.5">
-                                <span class="font-medium text-ink">{{ __('Elevasi (Pitch)') }}</span>
-                                <span class="font-mono text-[11px] text-muted uppercase">
-                                    {{ $latestTelemetry?->elev_state ?? 'idle' }}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-                                <div>
-                                    <div class="text-[10px] text-muted">{{ __('Saat Ini (BNO)') }}</div>
-                                    <div class="text-sm font-bold text-ink mt-0.5">
-                                        {{ $latestTelemetry ? formatNumberId($latestTelemetry->pitch_elev, 1) : '--' }}°
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="text-[10px] text-muted">{{ __('Target (SPA)') }}</div>
-                                    <div class="text-sm font-bold text-accent mt-0.5">
-                                        {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_elev, 1) : '--' }}°
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Tombol Accordion Lihat Detail Teknis -->
+                        <button 
+                            type="button" 
+                            @click="showDetail = !showDetail" 
+                            class="w-full flex items-center justify-between p-2.5 rounded-xl border border-line bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                        >
+                            <span>{{ __('Lihat Detail Penyesuaian Sudut') }}</span>
+                            <svg class="w-4 h-4 transform transition-transform duration-200" :class="showDetail ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
 
-                        <!-- Azimut (Heading) Alignment -->
-                        <div class="p-2.5 rounded border border-line bg-bg/50">
-                            <div class="flex items-center justify-between text-xs mb-1.5">
-                                <span class="font-medium text-ink">{{ __('Azimut (Heading)') }}</span>
-                                <span class="font-mono text-[11px] text-muted uppercase">
-                                    {{ $latestTelemetry?->az_state ?? 'idle' }}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-                                <div>
-                                    <div class="text-[10px] text-muted">{{ __('Saat Ini (BNO)') }}</div>
-                                    <div class="text-sm font-bold text-ink mt-0.5">
-                                        {{ $latestTelemetry ? formatNumberId($latestTelemetry->azimuth, 1) : '--' }}°
+                        <!-- Area Detail Teknis (Elevasi & Azimut) -->
+                        <div x-show="showDetail" x-cloak class="space-y-2.5 pt-1">
+                            <!-- Elevasi (Pitch) Alignment -->
+                            <div class="p-3 rounded-xl border border-line bg-slate-50/50">
+                                <div class="flex items-center justify-between text-xs mb-1.5">
+                                    <span class="font-semibold text-ink">{{ __('Sudut Kemiringan (Elevasi)') }}</span>
+                                    <span class="text-[11px] text-muted capitalize">
+                                        {{ $latestTelemetry?->elev_state ?? 'idle' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <div class="text-[10px] text-muted">{{ __('Saat Ini (Sensor)') }}</div>
+                                        <div class="text-sm font-bold font-mono text-ink mt-0.5">
+                                            {{ $latestTelemetry ? formatNumberId($latestTelemetry->pitch_elev, 1) : '--' }}°
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-muted">{{ __('Target (Matahari)') }}</div>
+                                        <div class="text-sm font-bold font-mono text-blue-600 mt-0.5">
+                                            {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_elev, 1) : '--' }}°
+                                        </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-muted">{{ __('Target (SPA)') }}</div>
-                                    <div class="text-sm font-bold text-accent mt-0.5">
-                                        {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_az, 1) : '--' }}°
+                            </div>
+
+                            <!-- Azimut (Heading) Alignment -->
+                            <div class="p-3 rounded-xl border border-line bg-slate-50/50">
+                                <div class="flex items-center justify-between text-xs mb-1.5">
+                                    <span class="font-semibold text-ink">{{ __('Arah Kompas (Azimut)') }}</span>
+                                    <span class="text-[11px] text-muted capitalize">
+                                        {{ $latestTelemetry?->az_state ?? 'idle' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <div class="text-[10px] text-muted">{{ __('Saat Ini (Sensor)') }}</div>
+                                        <div class="text-sm font-bold font-mono text-ink mt-0.5">
+                                            {{ $latestTelemetry ? formatNumberId($latestTelemetry->azimuth, 1) : '--' }}°
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-muted">{{ __('Target (Matahari)') }}</div>
+                                        <div class="text-sm font-bold font-mono text-blue-600 mt-0.5">
+                                            {{ $latestTelemetry ? formatNumberId($latestTelemetry->target_az, 1) : '--' }}°
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -359,10 +479,12 @@
                         <!-- Link to Solar Tracker -->
                         <a 
                             href="{{ route('solar-tracker') }}" 
-                            class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent font-medium text-xs font-mono transition-colors"
+                            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs transition-colors"
                         >
                             <span>{{ __('Buka Kontrol Tracker') }}</span>
-                            <span>&rarr;</span>
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
                         </a>
                     </div>
                 @else
@@ -415,14 +537,16 @@
                             datasets: [{
                                 label: initialLabel,
                                 data: dataset.values,
-                                borderColor: '#3b82f6',
-                                borderWidth: 2,
-                                backgroundColor: 'transparent',
-                                fill: false,
-                                tension: 0.25,
+                                borderColor: '#2563eb',
+                                borderWidth: 2.5,
+                                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                fill: true,
+                                tension: 0.35,
                                 pointRadius: 0,
-                                pointHoverRadius: 4,
-                                pointBackgroundColor: '#3b82f6',
+                                pointHoverRadius: 5,
+                                pointBackgroundColor: '#2563eb',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
                             }]
                         },
                         options: {
@@ -447,7 +571,7 @@
                             scales: {
                                 x: {
                                     grid: {
-                                        color: 'rgba(55, 65, 81, 0.45)',
+                                        color: 'rgba(226, 232, 240, 0.7)',
                                     },
                                     ticks: {
                                         maxTicksLimit: 12
@@ -456,7 +580,7 @@
                                 y: {
                                     beginAtZero: true,
                                     grid: {
-                                        color: 'rgba(55, 65, 81, 0.45)',
+                                        color: 'rgba(226, 232, 240, 0.7)',
                                     },
                                     ticks: {
                                         callback: (value) => {
@@ -466,10 +590,11 @@
                                     title: {
                                         display: true,
                                         text: this.activeView === 'day' ? 'Daya (W)' : dataset.unit,
-                                        color: '#9ca3af',
+                                        color: '#64748b',
                                         font: {
-                                            family: "'JetBrains Mono', monospace",
-                                            size: 11
+                                            family: "'Inter', sans-serif",
+                                            size: 11,
+                                            weight: '500'
                                         }
                                     }
                                 }
