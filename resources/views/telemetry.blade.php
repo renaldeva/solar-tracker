@@ -8,7 +8,7 @@
             <div class="flex items-center space-x-2">
                 <a 
                     href="{{ route('telemetry.export', request()->all()) }}" 
-                    class="inline-flex items-center h-9 px-3 rounded-md border border-line bg-panel hover:bg-line/40 text-ink text-sm font-medium transition-colors"
+                    class="inline-flex items-center h-10 px-4 rounded-xl border border-line bg-panel hover:bg-slate-50 text-ink text-sm font-medium transition-colors shadow-xs"
                     title="{{ __('Ekspor CSV') }}"
                 >
                     <svg class="w-4 h-4 mr-2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -18,7 +18,7 @@
                 </a>
                 <a 
                     href="{{ route('solar-tracker', ['uid' => $device->uid ?? '']) }}" 
-                    class="inline-flex items-center h-9 px-3 rounded-md bg-accent text-ink text-sm font-medium hover:bg-blue-600 transition-colors"
+                    class="inline-flex items-center h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-xs"
                 >
                     <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -29,37 +29,69 @@
         </x-slot:actions>
     </x-page-header>
 
-    <!-- Filter & Control Toolbar -->
-    <div class="bg-panel border border-line rounded-md p-4 mb-6" x-data="{ rangeMode: '{{ $selectedRange }}' }">
+    <!-- Status Banner: "Apakah semuanya baik-baik saja?" -->
+    <div class="mb-6 p-4 rounded-2xl bg-white border border-line shadow-xs flex items-center justify-between">
+        <div class="flex items-center space-x-3.5">
+            <div class="w-3.5 h-3.5 rounded-full {{ ($device && $device->status === 'online') ? 'bg-emerald-500 ring-4 ring-emerald-50' : 'bg-amber-500 ring-4 ring-amber-50' }}"></div>
+            <div>
+                <h2 class="text-sm font-semibold text-ink">
+                    @if($device && $device->status === 'online')
+                        Aliran Sinyal Telemetri Aktif & Sinkron
+                    @else
+                        Sinyal Telemetri Terbatas / Perangkat Nonaktif
+                    @endif
+                </h2>
+                <p class="text-xs text-muted mt-0.5">
+                    Memantau unit <strong class="text-ink">{{ $device->name ?? 'Semua Unit' }}</strong> ({{ $device->uid ?? '--' }}). Siklus kirim sensor setiap 5 detik.
+                </p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center space-x-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                STREAM 5s
+            </span>
+        </div>
+    </div>
+
+    <!-- Filter & Control Card (Smart Nursery Style) -->
+    <div class="bg-white border border-line rounded-2xl p-5 mb-6 shadow-xs" x-data="{ rangeMode: '{{ $selectedRange }}' }">
         <form method="GET" action="{{ route('telemetry') }}" id="telemetryFilterForm" class="space-y-4">
-            <!-- Row 1: Device Selector & Range -->
-            <div class="flex flex-wrap items-center justify-between gap-4">
+            <!-- Row 1: Device Selector & Range Pills -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <!-- Device Picker -->
                 <div class="flex items-center space-x-2">
                     <label for="filter-device" class="text-xs font-semibold text-muted uppercase tracking-wider">{{ __('Perangkat:') }}</label>
-                    <select 
-                        id="filter-device" 
-                        name="device" 
-                        onchange="this.form.submit()" 
-                        class="text-xs font-medium bg-bg border border-line rounded-md px-3 py-1.5 text-ink focus:outline-none focus:border-accent"
-                    >
-                        @foreach($devices as $dev)
-                            <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
-                                {{ $dev->name }} ({{ $dev->uid }})
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="relative">
+                        <select 
+                            id="filter-device" 
+                            name="device" 
+                            onchange="this.form.submit()" 
+                            class="appearance-none text-xs font-semibold bg-white border border-line rounded-xl pl-3 pr-8 py-2 text-ink focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        >
+                            @foreach($devices as $dev)
+                                <option value="{{ $dev->uid }}" {{ $device && $device->uid === $dev->uid ? 'selected' : '' }}>
+                                    {{ $dev->name }} ({{ $dev->uid }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Range Buttons -->
-                <div class="flex flex-wrap items-center gap-1">
+                <!-- Range Buttons (Pill Buttons) -->
+                <div class="flex flex-wrap items-center gap-1.5 p-1 bg-slate-50 border border-line rounded-xl">
                     @foreach(['1h' => '1 Jam', '6h' => '6 Jam', '24h' => '24 Jam', '7d' => '7 Hari'] as $val => $label)
                         <button 
                             type="submit" 
                             name="range" 
                             value="{{ $val }}" 
                             @click="rangeMode = '{{ $val }}'"
-                            class="px-2.5 py-1 text-xs font-mono rounded transition-colors {{ $selectedRange === $val ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line' }}"
+                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $selectedRange === $val ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-white' }}"
                         >
                             {{ $label }}
                         </button>
@@ -67,8 +99,8 @@
                     <button 
                         type="button" 
                         @click="rangeMode = 'custom'" 
-                        :class="rangeMode === 'custom' ? 'bg-accent text-ink' : 'bg-bg text-muted hover:text-ink border border-line'"
-                        class="px-2.5 py-1 text-xs font-mono rounded transition-colors cursor-pointer"
+                        :class="rangeMode === 'custom' ? 'bg-blue-600 text-white shadow-xs' : 'text-muted hover:text-ink hover:bg-white'"
+                        class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
                     >
                         Kustom
                     </button>
@@ -79,77 +111,77 @@
             <div x-show="rangeMode === 'custom'" x-cloak class="pt-3 border-t border-line flex flex-wrap items-center gap-3">
                 <input type="hidden" name="range" value="custom">
                 <div class="flex items-center space-x-2 text-xs">
-                    <span class="text-muted">Dari:</span>
+                    <span class="text-muted font-medium">Dari:</span>
                     <input 
                         type="datetime-local" 
                         name="start_date" 
                         value="{{ $startDate }}" 
-                        class="bg-bg border border-line rounded px-2.5 py-1 text-xs text-ink focus:outline-none focus:border-accent font-mono"
+                        class="bg-white border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
                     >
                 </div>
                 <div class="flex items-center space-x-2 text-xs">
-                    <span class="text-muted">Sampai:</span>
+                    <span class="text-muted font-medium">Sampai:</span>
                     <input 
                         type="datetime-local" 
                         name="end_date" 
                         value="{{ $endDate }}" 
-                        class="bg-bg border border-line rounded px-2.5 py-1 text-xs text-ink focus:outline-none focus:border-accent font-mono"
+                        class="bg-white border border-line rounded-xl px-3 py-1.5 text-xs text-ink focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
                     >
                 </div>
                 <button 
                     type="submit" 
-                    class="px-3 py-1 rounded bg-accent text-ink text-xs font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+                    class="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors shadow-xs cursor-pointer"
                 >
                     Terapkan Rentang
                 </button>
             </div>
 
-            <!-- Metric Multi-Select Badges Row -->
+            <!-- Metric Multi-Select Badges Row (Chips) -->
             <div class="pt-3 border-t border-line flex flex-wrap items-center gap-2">
                 <span class="text-xs font-semibold text-muted uppercase tracking-wider mr-2">{{ __('Metrik Terlihat:') }}</span>
                 @php
                     $availableMetrics = [
                         'power' => [
                             'label' => __('Daya (W)'), 
-                            'active_class' => 'text-blue-400 bg-blue-500/10 border-blue-500/40',
-                            'dot' => 'bg-blue-500'
+                            'active_class' => 'text-blue-700 bg-blue-50 border-blue-200 ring-1 ring-blue-200 font-semibold',
+                            'dot' => 'bg-blue-600'
                         ],
                         'voltage' => [
                             'label' => __('Tegangan (V)'), 
-                            'active_class' => 'text-amber-400 bg-amber-500/10 border-amber-500/40',
+                            'active_class' => 'text-amber-700 bg-amber-50 border-amber-200 ring-1 ring-amber-200 font-semibold',
                             'dot' => 'bg-amber-500'
                         ],
                         'current' => [
                             'label' => __('Arus (A)'), 
-                            'active_class' => 'text-emerald-400 bg-emerald-500/10 border-emerald-500/40',
+                            'active_class' => 'text-emerald-700 bg-emerald-50 border-emerald-200 ring-1 ring-emerald-200 font-semibold',
                             'dot' => 'bg-emerald-500'
                         ],
                         'wind_speed' => [
                             'label' => __('Kecepatan Angin (m/s)'), 
-                            'active_class' => 'text-rose-400 bg-rose-500/10 border-rose-500/40',
+                            'active_class' => 'text-rose-700 bg-rose-50 border-rose-200 ring-1 ring-rose-200 font-semibold',
                             'dot' => 'bg-rose-500'
                         ],
                         'pitch_elev' => [
                             'label' => __('Elevasi (°)'), 
-                            'active_class' => 'text-purple-400 bg-purple-500/10 border-purple-500/40',
-                            'dot' => 'bg-purple-500'
+                            'active_class' => 'text-purple-700 bg-purple-50 border-purple-200 ring-1 ring-purple-200 font-semibold',
+                            'dot' => 'bg-purple-600'
                         ],
                         'azimuth' => [
                             'label' => __('Azimut (°)'), 
-                            'active_class' => 'text-cyan-400 bg-cyan-500/10 border-cyan-500/40',
-                            'dot' => 'bg-cyan-500'
+                            'active_class' => 'text-cyan-700 bg-cyan-50 border-cyan-200 ring-1 ring-cyan-200 font-semibold',
+                            'dot' => 'bg-cyan-600'
                         ],
                         'temp_c' => [
                             'label' => __('Suhu Panel (°C)'), 
-                            'active_class' => 'text-pink-400 bg-pink-500/10 border-pink-500/40',
-                            'dot' => 'bg-pink-500'
+                            'active_class' => 'text-pink-700 bg-pink-50 border-pink-200 ring-1 ring-pink-200 font-semibold',
+                            'dot' => 'bg-pink-600'
                         ],
                     ];
                 @endphp
 
                 @foreach($availableMetrics as $key => $meta)
                     @php $checked = in_array($key, $selectedMetrics, true); @endphp
-                    <label class="cursor-pointer inline-flex items-center space-x-2 px-2.5 py-1 rounded border text-xs font-medium transition-all {{ $checked ? $meta['active_class'] : 'bg-bg/50 text-muted border-line opacity-60 hover:opacity-100' }}">
+                    <label class="cursor-pointer inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all shadow-2xs {{ $checked ? $meta['active_class'] : 'bg-white text-muted border-line opacity-60 hover:opacity-100 hover:border-slate-300' }}">
                         <input 
                             type="checkbox" 
                             name="metrics[]" 
@@ -158,7 +190,7 @@
                             {{ $checked ? 'checked' : '' }} 
                             class="sr-only"
                         >
-                        <span class="w-2 h-2 rounded-full {{ $checked ? $meta['dot'] : 'bg-line' }}"></span>
+                        <span class="w-2 h-2 rounded-full {{ $checked ? $meta['dot'] : 'bg-slate-300' }}"></span>
                         <span>{{ $meta['label'] }}</span>
                     </label>
                 @endforeach
@@ -166,12 +198,12 @@
         </form>
     </div>
 
-    <!-- Chart Panel -->
+    <!-- Chart Card (Smart Nursery Style) -->
     <div 
         x-data="telemetryChartComponent(@js($chartData), '{{ $device->uid ?? '' }}', '{{ $selectedRange }}', @js($selectedMetrics), '{{ $startDate ?? '' }}', '{{ $endDate ?? '' }}')" 
-        class="bg-panel border border-line rounded-md p-4 mb-6"
+        class="bg-white border border-line rounded-2xl p-5 mb-6 shadow-xs"
     >
-        <div class="flex items-center justify-between pb-3 border-b border-line mb-3">
+        <div class="flex items-center justify-between pb-3.5 border-b border-line mb-4">
             <div class="flex items-center space-x-3">
                 <h2 class="text-sm font-semibold text-ink">{{ __('Bentuk Gelombang Deret Waktu') }}</h2>
                 <span class="text-xs text-muted font-mono">
@@ -179,8 +211,8 @@
                 </span>
             </div>
             <div class="flex items-center space-x-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold border border-ok/30 text-ok bg-ok/10">
-                    <span class="w-1.5 h-1.5 rounded-full bg-ok mr-1.5 animate-pulse"></span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-semibold border border-emerald-200 text-emerald-700 bg-emerald-50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
                     {{ __('STREAM AKTIF (5s)') }}
                 </span>
             </div>
@@ -190,9 +222,9 @@
         </div>
     </div>
 
-    <!-- High-Density Telemetry Table -->
-    <div class="bg-panel border border-line rounded-md overflow-hidden mb-6">
-        <div class="p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <!-- High-Density Telemetry Table Card -->
+    <div class="bg-white border border-line rounded-2xl overflow-hidden mb-6 shadow-xs">
+        <div class="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/40">
             <div>
                 <h3 class="text-sm font-semibold text-ink">{{ __('Paket Sensor Terekam') }}</h3>
                 <p class="text-xs text-muted mt-0.5">{{ __('Waktu ditampilkan dalam UTC+7 (WIB)') }}</p>
@@ -208,57 +240,57 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-bg/40 text-muted uppercase text-xs tracking-wider border-b border-line">
+                <thead class="bg-slate-50/70 text-muted uppercase text-[11px] font-semibold tracking-wider border-b border-line">
                     <tr>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Waktu (WIB)') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Mode') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Tegangan') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Arus') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Daya') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Kumulatif Wh') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Kecepatan Angin') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Elevasi') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Azimut') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Suhu') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Sinyal GPS') }}</th>
-                        <th class="py-2.5 px-3 font-medium">{{ __('Kalibrasi IMU') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Waktu (WIB)') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Mode') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Tegangan') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Arus') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Daya') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Kumulatif Wh') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Kecepatan Angin') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Elevasi') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Azimut') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Suhu') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Sinyal GPS') }}</th>
+                        <th class="py-3 px-3.5">{{ __('Kalibrasi IMU') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-line font-mono text-xs">
                     @forelse($telemetries as $tel)
-                        <tr class="hover:bg-line/20 transition-colors">
-                            <td class="py-2.5 px-3 font-mono text-ink whitespace-nowrap">
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="py-3 px-3.5 font-mono text-ink whitespace-nowrap">
                                 {{ $tel->recorded_at ? $tel->recorded_at->setTimezone('Asia/Jakarta')->format('d M H:i:s') . ' WIB' : '--' }}
                             </td>
-                            <td class="py-2.5 px-3">
-                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono uppercase border border-line
-                                    {{ $tel->mode === 'auto' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : ($tel->mode === 'stow' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-bg text-muted') }}">
+                            <td class="py-3 px-3.5">
+                                <span class="px-2 py-0.5 rounded-md text-[11px] font-mono uppercase border border-line
+                                    {{ $tel->mode === 'auto' ? 'bg-blue-50 text-blue-700 border-blue-200' : ($tel->mode === 'stow' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-50 text-muted') }}">
                                     {{ match(strtolower($tel->mode)) { 'auto' => __('Otomatis'), 'manual' => __('Manual'), 'stow' => __('Stow'), default => strtoupper($tel->mode) } }}
                                 </span>
                             </td>
-                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->voltage, 1) }} V</td>
-                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->current, 2) }} A</td>
-                            <td class="py-2.5 px-3 font-bold text-accent">{{ formatPowerW($tel->power) }}</td>
-                            <td class="py-2.5 px-3 text-muted">{{ formatNumberId($tel->energy_wh, 0) }} Wh</td>
-                            <td class="py-2.5 px-3 {{ $tel->wind_speed >= 15.0 ? 'text-danger font-bold' : 'text-ink' }}">
+                            <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->voltage, 1) }} V</td>
+                            <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->current, 2) }} A</td>
+                            <td class="py-3 px-3.5 font-bold text-blue-600">{{ formatPowerW($tel->power) }}</td>
+                            <td class="py-3 px-3.5 text-muted">{{ formatNumberId($tel->energy_wh, 0) }} Wh</td>
+                            <td class="py-3 px-3.5 {{ $tel->wind_speed >= 15.0 ? 'text-rose-600 font-bold' : 'text-ink' }}">
                                 {{ formatNumberId($tel->wind_speed, 1) }} m/s
                             </td>
-                            <td class="py-2.5 px-3 text-ink">
+                            <td class="py-3 px-3.5 text-ink">
                                 {{ formatNumberId($tel->pitch_elev, 1) }}&deg;
                                 <span class="text-muted text-[11px]">({{ formatNumberId($tel->target_elev, 1) }}&deg;)</span>
                             </td>
-                            <td class="py-2.5 px-3 text-ink">
+                            <td class="py-3 px-3.5 text-ink">
                                 {{ formatNumberId($tel->azimuth, 1) }}&deg;
                                 <span class="text-muted text-[11px]">({{ formatNumberId($tel->target_az, 1) }}&deg;)</span>
                             </td>
-                            <td class="py-2.5 px-3 text-ink">{{ formatNumberId($tel->temp_c, 1) }}&deg;C</td>
-                            <td class="py-2.5 px-3">
-                                <span class="text-[11px] {{ $tel->fix ? 'text-ok font-semibold' : 'text-warn' }}">
+                            <td class="py-3 px-3.5 text-ink">{{ formatNumberId($tel->temp_c, 1) }}&deg;C</td>
+                            <td class="py-3 px-3.5">
+                                <span class="text-[11px] {{ $tel->fix ? 'text-emerald-600 font-semibold' : 'text-amber-600' }}">
                                     {{ $tel->fix ? '3D (' . $tel->satellites . 's)' : 'No Fix' }}
                                 </span>
                             </td>
-                            <td class="py-2.5 px-3">
-                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono border {{ $tel->cal_sys >= 2 ? 'border-ok/30 text-ok bg-ok/10' : 'border-warn/30 text-warn bg-warn/10' }}">
+                            <td class="py-3 px-3.5">
+                                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono border {{ $tel->cal_sys >= 2 ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-amber-200 text-amber-700 bg-amber-50' }}">
                                     Sys:{{ $tel->cal_sys ?? 0 }}
                                 </span>
                             </td>
@@ -275,7 +307,7 @@
         </div>
 
         @if($telemetries->hasPages())
-            <div class="p-3 border-t border-line bg-bg/40">
+            <div class="p-4 border-t border-line bg-slate-50/40">
                 {{ $telemetries->links() }}
             </div>
         @endif
@@ -379,20 +411,20 @@
                                         boxWidth: 12,
                                         boxHeight: 12,
                                         font: { size: 12, family: 'Inter' },
-                                        color: '#9ca3af',
+                                        color: '#64748b',
                                         padding: 14
                                     }
                                 },
                                 tooltip: {
-                                    backgroundColor: '#1f2937',
-                                    titleColor: '#f9fafb',
-                                    bodyColor: '#f9fafb',
-                                    borderColor: '#374151',
+                                    backgroundColor: '#0f172a',
+                                    titleColor: '#ffffff',
+                                    bodyColor: '#ffffff',
+                                    borderColor: '#e2e8f0',
                                     borderWidth: 1,
                                     padding: 10,
                                     titleFont: { size: 12, family: 'Inter' },
                                     bodyFont: { size: 12, family: 'JetBrains Mono' },
-                                    cornerRadius: 6,
+                                    cornerRadius: 8,
                                     callbacks: {
                                         label: function(context) {
                                             const label = context.dataset.label || '';
@@ -404,10 +436,10 @@
                             },
                             scales: {
                                 x: {
-                                    grid: { color: '#374151', drawTicks: false },
+                                    grid: { color: '#f1f5f9', drawTicks: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#9ca3af',
+                                        color: '#64748b',
                                         maxTicksLimit: 12
                                     }
                                 },
@@ -415,10 +447,10 @@
                                     type: 'linear',
                                     display: true,
                                     position: 'left',
-                                    grid: { color: '#374151', drawTicks: false },
+                                    grid: { color: '#f1f5f9', drawTicks: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#9ca3af',
+                                        color: '#64748b',
                                         callback: function(value) {
                                             return numberFmt.format(value);
                                         }
@@ -431,7 +463,7 @@
                                     grid: { drawOnChartArea: false },
                                     ticks: {
                                         font: { size: 11, family: 'JetBrains Mono' },
-                                        color: '#9ca3af',
+                                        color: '#64748b',
                                         callback: function(value) {
                                             return numberFmt.format(value);
                                         }
